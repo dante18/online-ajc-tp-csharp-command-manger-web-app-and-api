@@ -1,0 +1,31 @@
+﻿@using EatDomicile.Web.ViewModels.Drinks
+@model IEnumerable<DrinkViewModel>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Fizzy</th>
+            <th>KCal</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var drink in Model) {
+        <tr>
+            <td>@drink.Name</td>
+            <td>@drink.Price</td>
+            <td>@drink.Fizzy</td>
+            <td>@drink.KCal</td>
+            <td>
+                <a asp-action="Details" asp-route-id="@drink.Id" class="btn btn-info">Détails</a>
+                <a asp-action="Edit" asp-route-id="@drink.Id" class="btn btn-warning">Modifier</a>
+                <a asp-action="Delete" asp-route-id="@drink.Id" class="btn btn-danger">Supprimer</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
