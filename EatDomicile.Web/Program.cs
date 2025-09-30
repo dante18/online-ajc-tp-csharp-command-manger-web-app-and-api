@@ -1,10 +1,17 @@
+
+using EatDomicile.Web.Services.Drinks;
+using EatDomicile.Web.Services.Interfaces;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpClient();
+builder.Services.TryAddTransient<DrinksService>();
+var uriApi = builder.Configuration.GetValue<string>("ApiSettings:BaseUrl");
 
 var app = builder.Build();
-
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

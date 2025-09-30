@@ -2,7 +2,7 @@ using EatDomicile.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace EatDomicile.Web.Controllers
+namespace BookStore.web.Controllers
 {
     public class HomeController : Controller
     {
