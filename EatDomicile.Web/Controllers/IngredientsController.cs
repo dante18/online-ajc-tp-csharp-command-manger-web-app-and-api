@@ -48,7 +48,14 @@ namespace EatDomicile.Web.Controllers
             });
         }
 
-        // GET: IngredientsController/Create
+
+        public IActionResult Create()
+        {
+            var ingredientCreateViewModel = new IngredientCreateViewModel();
+            return this.View(ingredientCreateViewModel);
+        }
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind("Name,KCal,IsAllergen")] IngredientCreateViewModel ingredientCreateViewModel)
@@ -58,14 +65,14 @@ namespace EatDomicile.Web.Controllers
 
             try
             {
-                var newDrink = new IngredientDTO
+                var newIngredient = new IngredientDTO
                 {
                     Name = ingredientCreateViewModel.Name,
                     KCal = ingredientCreateViewModel.KCal,
                     IsAllergen = ingredientCreateViewModel.IsAllergen
                 };
 
-                await this.ingredientService.CreateDrinkAsync(newDrink);
+                await this.ingredientService.CreateIngredientAsync(newIngredient);
                 return this.RedirectToAction(nameof(this.Index));
             }
             catch
@@ -74,60 +81,88 @@ namespace EatDomicile.Web.Controllers
             }
         }
 
-        // POST: IngredientsController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
 
-        // GET: IngredientsController/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> Edit(int id)
         {
-            return View();
+            var ingredient = await this.ingredientService.GetIngredientAsync(id);
+
+            if (ingredient is null)
+            {
+                return this.NotFound();
+            }
+
+            var ingredientEditViewModel = new IngredientEditViewModel
+            {
+                Id = ingredient.Id,
+                Name = ingredient.Name,
+                KCal = ingredient.KCal,
+                IsAllergen = ingredient.IsAllergen,
+            };
+
+            return this.View(ingredientEditViewModel);
         }
 
         // POST: IngredientsController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<ActionResult> Edit(int id, [Bind("Id,Name,KCal,IsAllergen")] IngredientEditViewModel ingredientEditViewModel)
         {
+            if (!this.ModelState.IsValid)
+                return this.View(ingredientEditViewModel);
+
             try
             {
-                return RedirectToAction(nameof(Index));
+                var editIngredient = new IngredientDTO
+                {
+                    Id = ingredientEditViewModel.Id,
+                    Name = ingredientEditViewModel.Name,
+                    KCal = ingredientEditViewModel.KCal,
+                    IsAllergen = ingredientEditViewModel.IsAllergen
+                };
+
+                await this.ingredientService.UpdateIngredientAsync(id, editIngredient);
+
+                return this.RedirectToAction(nameof(this.Index));
             }
             catch
             {
-                return View();
+                return this.View();
             }
         }
 
-        // GET: IngredientsController/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            return View();
+            var ingredient = await this.ingredientService.GetIngredientAsync(id);
+
+            if (ingredient is null)
+            {
+                return this.NotFound();
+            }
+
+            var ingredientFound = new IngredientViewModel
+            {
+                Id = ingredient.Id,
+                Name = ingredient.Name,
+                KCal = ingredient.KCal,
+                IsAllergen = ingredient.IsAllergen
+            };
+
+            return this.View(ingredientFound);
         }
 
-        // POST: IngredientsController/Delete/5
+        // POST: DrinksController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> DeleteConfirmed(int id)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                await this.ingredientService.DeleteIngredientAsync(id);
+                return this.RedirectToAction(nameof(this.Index));
             }
             catch
             {
-                return View();
+                return this.View(nameof(this.Details));
             }
         }
     }

@@ -22,19 +22,19 @@ public class IngredientsService
         return drink;
     }
 
-    public async Task CreateDrinkAsync(IngredientDTO ingredientDTO)
+    public async Task CreateIngredientAsync(IngredientDTO ingredientDTO)
     {
         var response = await this.httpClient.PostAsJsonAsync("https://localhost:7001/api/ingredients", ingredientDTO);
         _ = response.EnsureSuccessStatusCode();
     }
 
-    public async Task UpdateDrinkAsync(int id, IngredientDTO ingredientDTO)
+    public async Task UpdateIngredientAsync(int id, IngredientDTO ingredientDTO)
     {
         var response = await this.httpClient.PutAsJsonAsync($"https://localhost:7001/api/ingredients/{id}", ingredientDTO);
         _ = response.EnsureSuccessStatusCode();
     }
 
-    public async Task DeleteDrinkAsync(int id)
+    public async Task DeleteIngredientAsync(int id)
     {
         var response = await this.httpClient.DeleteAsync($"https://localhost:7001/api/ingredients/{id}");
         _ = response.EnsureSuccessStatusCode();

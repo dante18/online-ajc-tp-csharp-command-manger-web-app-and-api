@@ -1,5 +1,6 @@
 
 using EatDomicile.Web.Services.Drinks;
+using EatDomicile.Web.Services.Ingredients;
 using EatDomicile.Web.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient();
 builder.Services.TryAddTransient<DrinksService>();
+builder.Services.TryAddTransient<IngredientsService>();
 var uriApi = builder.Configuration.GetValue<string>("ApiSettings:BaseUrl");
 
 var app = builder.Build();
