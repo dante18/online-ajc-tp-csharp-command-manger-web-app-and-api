@@ -1,11 +1,12 @@
-﻿namespace EatDomicile.Api.Dtos.Burger
+﻿namespace EatDomicile.Api.Dtos.Burger;
+
+public class BurgerDto
 {
-    public class BurgerDto
-    {
-        public int? Id { get; set; }
+    public int? Id { get; set; }
 
-        public string Name { get; set; }
+    public bool Vegetarian { get; set; }
 
-        public decimal Price { get; set; }
-    }
+    public string Name { get; set; }
+
+    public decimal Price { get; set; }
 }
