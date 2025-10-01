@@ -114,7 +114,7 @@ namespace EatDomicile.Api.Controllers
                 }
             };
 
-            return Results.Created($"/api/pastas/{user.Id}", userDto);
+            return Results.Created($"/api/users/{user.Id}", userDto);
         }
 
         [HttpPut("{id}")]
