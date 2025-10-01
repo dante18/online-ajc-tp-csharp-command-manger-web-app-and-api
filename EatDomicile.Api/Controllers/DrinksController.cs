@@ -19,7 +19,14 @@ public class DrinksController : ControllerBase
     [HttpGet]
     public IResult GetDrinks()
     {
-        List<Drink> drinks = this.drinkService.GetAllDrinks();
+        List<DrinkDto> drinks = this.drinkService.GetAllDrinks().Select(d => new DrinkDto()
+        {
+            Id = d.Id,
+            Name = d.Name,
+            Fizzy = d.Fizzy,
+            KCal = d.KCal,
+            Price = d.Price
+        }).ToList();
 
         return Results.Ok(drinks);
     }
@@ -31,7 +38,16 @@ public class DrinksController : ControllerBase
         if (drink is null)
             return Results.NotFound($"Drink not found by id : {id}");
 
-        return Results.Ok(drink);
+        DrinkDto drinkDto = new DrinkDto()
+        {
+            Id = drink.Id,
+            Name = drink.Name,
+            Fizzy = drink.Fizzy,
+            KCal = drink.KCal,
+            Price = drink.Price
+        };
+
+        return Results.Ok(drinkDto);
     }
 
     [HttpPost()]
@@ -50,7 +66,16 @@ public class DrinksController : ControllerBase
 
         this.drinkService.CreateDrink(drink);
 
-        return Results.Created($"/api/drinks/{drink.Id}", drink);
+        DrinkDto drinkDto = new DrinkDto()
+        {
+            Id = drink.Id,
+            Name = drink.Name,
+            Fizzy = drink.Fizzy,
+            KCal = drink.KCal,
+            Price = drink.Price
+        };
+
+        return Results.Created($"/api/drinks/{drink.Id}", drinkDto);
     }
 
     [HttpPut("{id}")]
