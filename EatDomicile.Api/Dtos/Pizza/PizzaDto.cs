@@ -1,13 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using EatDomicile.Api.Dtos.Dough;
 
-namespace EatDomicile.Api.Dtos.Pizza
+namespace EatDomicile.Api.Dtos.Pizza;
+
+public class PizzaDto
 {
-    public class PizzaDto
-    {
-        public string Name { get; set; }
+    public int? Id { get; set; }
 
-        public decimal Price { get; set; }
+    public string Name { get; set; }
 
-        public int Dough { get; set; }
-    }
+    public decimal Price { get; set; }
+
+    public DoughsDto Doughs { get; set; }
+
+    public bool Vegetarian { get; set; }
 }
