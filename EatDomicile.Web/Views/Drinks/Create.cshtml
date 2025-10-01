@@ -1,7 +1,17 @@
 ﻿@model EatDomicile.Web.ViewModels.Drinks.DrinkCreateViewModel
 
-<h4>DrinkCreateViewModel</h4>
-<hr />
+@{
+    ViewData["Title"] = "Ajouter boissons";
+}
+
+<div class="row">
+    <div class="col-6 d-flex align-items-center justify-content-start">
+        <h1>Ajouter une boisson</h1>
+    </div>
+    <div class="col-6 d-flex align-items-center justify-content-end">
+        <a asp-action="Index" class="btn btn-primary">Retourner sur la liste des boissons</a>
+    </div>
+</div>
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create" method="post">
@@ -27,13 +37,9 @@
                 </label>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Ajouter" class="btn btn-primary" />
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 

@@ -1,31 +1,44 @@
-﻿@using EatDomicile.Web.ViewModels.Drinks
-@model IEnumerable<DrinkViewModel>
+﻿@model IEnumerable<EatDomicile.Web.ViewModels.Drinks.DrinkViewModel>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Price</th>
-            <th>Fizzy</th>
-            <th>KCal</th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var drink in Model) {
-        <tr>
-            <td>@drink.Name</td>
-            <td>@drink.Price</td>
-            <td>@drink.Fizzy</td>
-            <td>@drink.KCal</td>
-            <td>
-                <a asp-action="Details" asp-route-id="@drink.Id" class="btn btn-info">Détails</a>
-                <a asp-action="Edit" asp-route-id="@drink.Id" class="btn btn-warning">Modifier</a>
-                <a asp-action="Delete" asp-route-id="@drink.Id" class="btn btn-danger">Supprimer</a>
-            </td>
-        </tr>
+@{
+    ViewData["Title"] = "Boissons";
 }
-    </tbody>
-</table>
+
+<div class="row">
+    <div class="col-6 d-flex align-items-center justify-content-start">
+        <h1>Liste des boissons</h1>
+    </div>
+    <div class="col-6 d-flex align-items-center justify-content-end">
+        <a asp-action="Create" class="btn btn-primary">Ajouter une boisson</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 table-responsive mt-3">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th class="text-center">Nom</th>
+                    <th class="text-center">Prix</th>
+                    <th class="text-center">Type</th>
+                    <th class="text-center">KCal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var drink in Model)
+                {
+                    <tr>
+                        <td class="text-center">@drink.Name</td>
+                        <td class="text-center">@drink.Price</td>
+                        <td class="text-center">@(drink.Fizzy ? "Pétillant" : "Non pétillant")</td>
+                        <td class="text-center">@drink.KCal</td>
+                        <td class="text-center">
+                            <a asp-action="Details" asp-route-id="@drink.Id" class="btn btn-info">Détail</a>
+                            <a asp-action="Edit" asp-route-id="@drink.Id" class="btn btn-warning">Modifier</a>
+                            <a asp-action="Delete" asp-route-id="@drink.Id" class="btn btn-danger">Supprimer</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

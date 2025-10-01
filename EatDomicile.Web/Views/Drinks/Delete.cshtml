@@ -1,39 +1,61 @@
 ﻿@model EatDomicile.Web.ViewModels.Drinks.DrinkViewModel
 
 @{
-    this.ViewBag.Title = Model.Name;
-    this.Layout = "_Layout";
+    ViewData["Title"] = "Supprimer boissons";
 }
-<div>
-    <h4>@(this.Model.Name)</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            Prix :
-        </dt>
-        <dd class = "col-sm-10">
-            @(Model.Price)€
-        </dd>
-        <dt class = "col-sm-2">
-            KCal :
-        </dt>
-        <dd class = "col-sm-10">
-            @(Model.KCal)
-        </dd>
-        <dt class = "col-sm-2">
-            Type de boisson
-            </dt>
-        <dd class = "col-sm-10">
-            @(Model.Fizzy ? "Pétillant" : "Non Pétillant")
-        </dd>
-    </dl>
+
+<div class="row">
+    <div class="col-6 d-flex align-items-center justify-content-start mt-3">
+        <h1>Supprimer une boisson</h1>
+    </div>
+    <div class="col-6 d-flex align-items-center justify-content-end">
+        <a asp-action="Index" class="btn btn-primary">Annuler et retourner sur la liste des boissons</a>
+    </div>
 </div>
-<div>
-    <form asp-action="DeleteConfirmed" method="post">
-        <input type="hidden" asp-for="Id" />
-        <div class="form-group">
-            <input type="submit" value="Supprimer" class="btn btn-danger" /> |
-            <a asp-action="Index" class="btn btn-secondary">Annuler</a>
+<div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-start">
+        <h3>Êtes-vous sûr de vouloir supprimer cette boisson ?</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-start">
+        <dl class="row">
+            <dt class="col-sm-4">
+                Nom :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Name)
+            </dd>
+            <dt class="col-sm-4">
+                Prix :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Price)€
+            </dd>
+            <dt class="col-sm-4">
+                KCal :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.KCal)
+            </dd>
+            <dt class="col-sm-4">
+                Type de boisson
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Fizzy ? "Pétillant" : "Non Pétillant")
+            </dd>
+        </dl>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-start">
+        <div>
+            <form asp-action="DeleteConfirmed" method="post">
+                <input type="hidden" asp-for="Id" />
+                <div class="form-group">
+                    <input type="submit" value="Supprimer" class="btn btn-danger" />
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>

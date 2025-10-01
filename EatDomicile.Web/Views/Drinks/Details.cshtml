@@ -1,35 +1,45 @@
 ﻿@model EatDomicile.Web.ViewModels.Drinks.DrinkDetailsViewModel
 
 @{
-    this.ViewBag.Title = Model.Name;
-    this.Layout = "_Layout";
+    ViewData["Title"] = "Détail boissons";
 }
-<div>
-    <h4>@(this.Model.Name)</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            Prix :
-        </dt>
-        <dd class = "col-sm-10">
-            @(Model.Price)€
-        </dd>
-        <dt class = "col-sm-2">
-            KCal :
-        </dt>
-        <dd class = "col-sm-10">
-            @(Model.KCal)
-        </dd>
-        <dt class = "col-sm-2">
-            Type de boisson
-            </dt>
-        <dd class = "col-sm-10">
-            @(Model.Fizzy ? "Pétillant" : "Non Pétillant")
-        </dd>
-    </dl>
+
+<div class="row">
+    <div class="col-6 d-flex align-items-center justify-content-start mt-3">
+        <h1>Détail d'une boisson</h1>
+    </div>
+    <div class="col-6 d-flex align-items-center justify-content-end">
+        <a asp-action="Index" class="btn btn-primary">Retourner sur la liste des boissons</a>
+        <a asp-action="Edit" asp-route-id="@(Model.Id) " class="btn btn-warning ms-2">Modifier la boisson</a>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@(Model.Id) " class="btn btn-warning">Modifier</a>
-     - 
-    <a asp-action="Index" class="btn btn-info">Retour</a>
+<div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-start">
+        <dl class="row">
+            <dt class="col-sm-4">
+                Nom :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Name)
+            </dd>
+            <dt class="col-sm-4">
+                Prix :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Price)€
+            </dd>
+            <dt class="col-sm-4">
+                KCal :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.KCal)
+            </dd>
+            <dt class="col-sm-4">
+                Type de boisson
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Fizzy ? "Pétillant" : "Non Pétillant")
+            </dd>
+        </dl>
+    </div>
 </div>

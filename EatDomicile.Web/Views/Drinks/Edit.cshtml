@@ -1,9 +1,19 @@
 ﻿@model EatDomicile.Web.ViewModels.Drinks.DrinkEditViewModel
 
-<h4>@(Model.Name)</h4>
-<hr />
+@{
+    ViewData["Title"] = "Modifier boissons";
+}
+
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-6 d-flex align-items-center justify-content-start mt-3">
+        <h1>Modifier une boisson</h1>
+    </div>
+    <div class="col-6 d-flex align-items-center justify-content-end">
+        <a asp-action="Index" class="btn btn-primary">Annuler et retourner sur la liste des boissons</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-start">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
@@ -31,9 +41,5 @@
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
