@@ -1,21 +1,21 @@
 ﻿using EatDomicile.Web.Services.Doughs.DTO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
 
-namespace EatDomicile.Web.Services.Pizzas.DTO;
+namespace EatDomicile.Web.ViewModels.Pizzas;
 
-public class PizzaDTO
+public class PizzaCreateViewModel
 {
     public int? Id { get; set; }
 
+    [DisplayName("Nom")]
     public string Name { get; set; }
 
+    [DisplayName("Prix")]
     public decimal Price { get; set; }
+    [DisplayName("Pâte")]
 
     public DoughsDTO Dough { get; set; }
 
+    [DisplayName("Végétarien")]
     public bool Vegetarian { get; set; }
 }

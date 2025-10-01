@@ -1,0 +1,45 @@
+﻿@model EatDomicile.Web.ViewModels.Pizzas.PizzaDetailsViewModel
+
+@{
+    ViewData["Title"] = "Détail pizza";
+}
+
+<div class="row">
+    <div class="col-6 d-flex align-items-center justify-content-start mt-3">
+        <h1>Détail d'une pizza</h1>
+    </div>
+    <div class="col-6 d-flex align-items-center justify-content-end">
+        <a asp-action="Index" class="btn btn-primary">Retourner sur la liste des pizzas</a>
+        <a asp-action="Edit" asp-route-id="@(Model.Id) " class="btn btn-warning ms-2">Modifier la pizza</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-start">
+        <dl class="row">
+            <dt class="col-sm-4">
+                Nom :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Name)
+            </dd>
+            <dt class="col-sm-4">
+                Prix :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Price)€
+            </dd>
+            <dt class="col-sm-4">
+                Pâte :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Dough.Name)
+            </dd>
+            <dt class="col-sm-4">
+                Végétarien
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Vegetarian ? "Oui" : "Non")
+            </dd>
+        </dl>
+    </div>
+</div>
