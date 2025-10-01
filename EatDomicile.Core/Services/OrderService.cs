@@ -27,7 +27,7 @@ public sealed class OrderService
         return _context.Orders
             .Include(o => o.User).ThenInclude(ou => ou.Address)
             .Include(o => o.DeliveryAddress)
-            .Include(o => o.OrderProduct).Where(o => o.Id == id).FirstOrDefault();
+            .Include(o => o.OrderProduct).ThenInclude(op => op.Product).Where(o => o.Id == id).FirstOrDefault();
     }
 
     public void CreateOrder(Order order)
@@ -56,7 +56,7 @@ public sealed class OrderService
 
     public void UpdateOrderRemoveProduct(Order order, int productId)
     {
-        var productToRemove = order.OrderProduct.First(op => op.ProductId == productId);
+        var productToRemove = order.OrderProduct.First(op => op.Id == productId);
         order.OrderProduct.Remove(productToRemove);
 
         this._context.SaveChanges();
