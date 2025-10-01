@@ -1,4 +1,4 @@
-﻿@model EatDomicile.Web.ViewModels.Pizzas.PizzaViewModel
+﻿@model EatDomicile.Web.ViewModels.Pizzas.PizzaCreateViewModel
 
 @{
     ViewData["Title"] = "Ajouter une pizza";
@@ -23,14 +23,14 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Doughs" class="control-label"></label>
-                <input asp-for="Doughs" class="form-control" />
-                <span asp-validation-for="Doughs" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="Price" class="control-label"></label>
                 <input asp-for="Price" class="form-control" />
                 <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DoughId">Pâte</label>
+                <select asp-for="DoughId" asp-items="this.Model.DoughsList"></select>
+                <span asp-validation-for="DoughId" class="text-danger"></span>
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">

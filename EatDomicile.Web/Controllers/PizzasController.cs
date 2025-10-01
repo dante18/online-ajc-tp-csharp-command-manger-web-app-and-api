@@ -5,6 +5,7 @@ using EatDomicile.Web.Services.Pizzas.DTO;
 using EatDomicile.Web.ViewModels.Doughs;
 using EatDomicile.Web.ViewModels.Pizzas;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace EatDomicile.Web.Controllers;
 
@@ -52,27 +53,30 @@ public class PizzasController : Controller
         });
     }
 
-    public IActionResult Create()
+    public async Task<IActionResult> Create()
     {
-        var pizzaCreateViewModel = new PizzaCreateViewModel();
+        var doughs = await this.doughService.GetDoughsAsync();
+        var pizzaCreateViewModel = new PizzaCreateViewModel
+        {
+            DoughsList = doughs.Select(dough => new SelectListItem(dough.Name, dough.Id.ToString())).ToList()
+        };
         return this.View(pizzaCreateViewModel);
     }
 
     // POST: PizzasController/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Create([Bind("Name,Price,Dough,Vegetarian")] PizzaCreateViewModel pizzaCreateViewModel)
+    public async Task<ActionResult> Create([Bind("Name,Price,DoughId,Vegetarian")] PizzaCreateViewModel pizzaCreateViewModel)
     {
         if (!this.ModelState.IsValid)
             return this.View(pizzaCreateViewModel);
-
         try
         {
-            var newPizza = new PizzaDTO
+            var newPizza = new CreatePizzaDTO
             {
                 Name = pizzaCreateViewModel.Name,
                 Price = pizzaCreateViewModel.Price,
-                Doughs = pizzaCreateViewModel.Doughs,
+                DoughsId = pizzaCreateViewModel.DoughId,
                 Vegetarian = pizzaCreateViewModel.Vegetarian
             };
 
@@ -88,7 +92,6 @@ public class PizzasController : Controller
     public async Task<ActionResult> Edit(int id)
     {
         var pizza = await this.pizzasService.GetPizzaAsync(id);
-
         if (pizza is null)
         {
             return this.NotFound();
