@@ -24,7 +24,7 @@ public class PizzasService
         return drink;
     }
 
-    public async Task CreatePizzaAsync(PizzaDTO pizzaDTO)
+    public async Task CreatePizzaAsync(CreatePizzaDTO pizzaDTO)
     {
         var response = await this.httpClient.PostAsJsonAsync("https://localhost:7001/api/pizzas", pizzaDTO);
         _ = response.EnsureSuccessStatusCode();

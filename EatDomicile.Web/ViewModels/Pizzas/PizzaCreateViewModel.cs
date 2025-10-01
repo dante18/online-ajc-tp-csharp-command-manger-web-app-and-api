@@ -1,4 +1,6 @@
 ﻿using EatDomicile.Web.Services.Doughs.DTO;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel;
 
 namespace EatDomicile.Web.ViewModels.Pizzas;
@@ -12,9 +14,13 @@ public class PizzaCreateViewModel
 
     [DisplayName("Prix")]
     public decimal Price { get; set; }
+    [DisplayName("Pâte")]
+    [ValidateNever]
+    public List<SelectListItem> DoughsList { get; set; }
 
     [DisplayName("Pâte")]
-    public DoughsDTO Doughs { get; set; }
+
+    public int DoughId { get; set; }
 
     [DisplayName("Végétarien")]
     public bool Vegetarian { get; set; }

@@ -13,14 +13,14 @@ public class DoughsService
     }
     public async Task<IEnumerable<DoughsDTO>> GetDoughsAsync()
     {
-        var drinks = await httpClient.GetFromJsonAsync<IEnumerable<DoughsDTO>>("https://localhost:7001/api/doughs");
-        return drinks ?? [];
+        var doughs = await httpClient.GetFromJsonAsync<IEnumerable<DoughsDTO>>("https://localhost:7001/api/doughs");
+        return doughs ?? [];
     }
 
     public async Task<DoughsDTO?> GetDoughAsync(int id)
     {
-        var drink = await httpClient.GetFromJsonAsync<DoughsDTO>($"https://localhost:7001/api/doughs/{id}");
-        return drink;
+        var dough = await httpClient.GetFromJsonAsync<DoughsDTO>($"https://localhost:7001/api/doughs/{id}");
+        return dough;
     }
 
     public async Task CreateDoughAsync(DoughsDTO doughsDTO)
