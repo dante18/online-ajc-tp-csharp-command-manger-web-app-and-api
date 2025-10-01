@@ -29,7 +29,7 @@
                     <tr>
                         <td class="text-center">@pizza.Name</td>
                         <td class="text-center">@pizza.Price</td>
-                        <td class="text-center">@pizza.Dough</td>
+                        <td class="text-center">@pizza.Doughs.Name</td>
                         <td class="text-center">@(pizza.Vegetarian ? "Oui" : "Non")</td>
                         <td class="text-center">
                             <a asp-action="Details" asp-route-id="@pizza.Id" class="btn btn-info">Détail</a>

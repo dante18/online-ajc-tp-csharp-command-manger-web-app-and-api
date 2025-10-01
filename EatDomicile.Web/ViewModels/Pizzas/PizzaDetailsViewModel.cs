@@ -14,7 +14,7 @@ public class PizzaDetailsViewModel
     public decimal Price { get; set; }
     [DisplayName("Pâte")]
 
-    public string Dough { get; set; }
+    public DoughsDTO Doughs { get; set; }
 
     [DisplayName("Végétarien")]
     public bool Vegetarian { get; set; }

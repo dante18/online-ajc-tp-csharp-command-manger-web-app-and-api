@@ -12,7 +12,7 @@ public class PizzasService
         this.httpClient = httpClient; 
     }
 
-    public async Task<IEnumerable<PizzaDTO>> GetPizzaAsync()
+    public async Task<IEnumerable<PizzaDTO>> GetPizzasAsync()
     {
         var drinks = await httpClient.GetFromJsonAsync<IEnumerable<PizzaDTO>>("https://localhost:7001/api/pizzas");
         return drinks ?? [];

@@ -1,4 +1,5 @@
 ﻿using EatDomicile.Core.Entities;
+using EatDomicile.Web.Services.Doughs;
 using EatDomicile.Web.Services.Pizzas;
 using EatDomicile.Web.Services.Pizzas.DTO;
 using EatDomicile.Web.ViewModels.Doughs;
@@ -10,22 +11,24 @@ namespace EatDomicile.Web.Controllers;
 public class PizzasController : Controller
 {
     private readonly PizzasService pizzasService;
+    private readonly DoughsService doughService;
 
-    public PizzasController(PizzasService pizzasService)
+    public PizzasController(PizzasService pizzasService, DoughsService doughService)
     {
         this.pizzasService = pizzasService;
+        this.doughService = doughService;
     }
 
     // GET PizzasController
     public async Task<IActionResult> Index()
     {
-        var pizza = await this.pizzasService.GetPizzaAsync();
+        var pizza = await this.pizzasService.GetPizzasAsync();
         return View(pizza.Select(static pizza => new PizzaViewModel()
         {
             Id = pizza.Id,
             Name = pizza.Name,
             Price = pizza.Price,
-            Dough = pizza.Dough,
+            Doughs = pizza.Doughs,
             Vegetarian = pizza.Vegetarian
         }));
     }
@@ -34,7 +37,6 @@ public class PizzasController : Controller
     public async Task<IActionResult> Details(int id)
     {
         var pizza = await this.pizzasService.GetPizzaAsync(id);
-
         if (pizza is null)
         {
             return this.NotFound();
@@ -45,7 +47,7 @@ public class PizzasController : Controller
             Id = pizza.Id,
             Name = pizza.Name,
             Price = pizza.Price,
-            Dough = pizza.Dough.Name,
+            Doughs = pizza.Doughs,
             Vegetarian = pizza.Vegetarian
         });
     }
@@ -70,7 +72,7 @@ public class PizzasController : Controller
             {
                 Name = pizzaCreateViewModel.Name,
                 Price = pizzaCreateViewModel.Price,
-                Dough = pizzaCreateViewModel.Dough,
+                Doughs = pizzaCreateViewModel.Doughs,
                 Vegetarian = pizzaCreateViewModel.Vegetarian
             };
 
@@ -96,7 +98,7 @@ public class PizzasController : Controller
         {
             Name = pizza.Name,
             Price = pizza.Price,
-            Dough = pizza.Dough,
+            Doughs = pizza.Doughs,
             Vegetarian = pizza.Vegetarian
         };
 
@@ -117,7 +119,7 @@ public class PizzasController : Controller
             {
                 Name = pizzaEditViewModel.Name,
                 Price = pizzaEditViewModel.Price,
-                Dough = pizzaEditViewModel.Dough,
+                Doughs = pizzaEditViewModel.Doughs,
                 Vegetarian = pizzaEditViewModel.Vegetarian
             };
 
@@ -144,7 +146,7 @@ public class PizzasController : Controller
         {
             Name = pizza.Name,
             Price = pizza.Price,
-            Dough = pizza.Dough,
+            Doughs = pizza.Doughs,
             Vegetarian = pizza.Vegetarian
         };
 
