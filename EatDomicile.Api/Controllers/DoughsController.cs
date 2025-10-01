@@ -1,80 +1,93 @@
 ﻿using EatDomicile.Api.Dtos.Dough;
-using EatDomicile.Api.Dtos.Drink;
-using EatDomicile.Api.Dtos.Pasta;
 using EatDomicile.Core.Entities;
 using EatDomicile.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace EatDomicile.Api.Controllers
+namespace EatDomicile.Api.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class DoughsController : Controller
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class DoughsController : Controller
+    private readonly DoughsService doughService;
+
+    public DoughsController(DoughsService doughService)
     {
-        private readonly DoughsService doughService;
+        this.doughService = doughService;
+    }
 
-        public DoughsController(DoughsService doughService)
+    [HttpGet]
+    public IResult GetDoughs()
+    {
+        List<DoughsDto> doughs = this.doughService.GetAllDoughs().Select(b => new DoughsDto()
         {
-            this.doughService = doughService;
-        }
+            Id = b.Id,
+            Name = b.Name,
+        }).ToList();
 
-        [HttpGet]
-        public IResult GetDoughs()
+        return Results.Ok(doughs);
+    }
+
+    [HttpGet("{id}")]
+    public IResult GetDough([FromRoute] int id)
+    {
+        Doughs doughs = this.doughService.GetDoughs(id);
+        if (doughs is null)
+            return Results.NotFound($"Doughs not found by id : {id}");
+
+        DoughsDto doughsDto = new DoughsDto()
         {
-            List<Doughs> doughs = this.doughService.GetAllDoughs();
+            Id = doughs.Id,
+            Name = doughs.Name,
+        };
 
-            return Results.Ok(doughs);
-        }
+        return Results.Ok(doughsDto);
+    }
 
-        [HttpGet("{id}")]
-        public IResult GetDough([FromRoute] int id)
+    public IResult CreateDough([FromBody] CreateOrUpdateDoughsDto dto)
+    {
+        if (!ModelState.IsValid)
+            return Results.BadRequest(ModelState);
+
+        Doughs doughs = new Doughs()
         {
-            Doughs dough = this.doughService.GetDoughs(id);
-            if (dough is null)
-                return Results.NotFound($"Dough not found by id : {id}");
+            Name = dto.Name
+        };
 
-            return Results.Ok(dough);
-        }
+        this.doughService.CreateDoughs(doughs);
 
-        public IResult CreateDough([FromBody] CreateOrUpdateDoughDto dto)
+        DoughsDto doughsDto = new DoughsDto()
         {
-            if (!ModelState.IsValid)
-                return Results.BadRequest(ModelState);
+            Id = doughs.Id,
+            Name = doughs.Name,
+        };
 
-            Doughs dough = new Doughs()
-            {
-                Name = dto.Name
-            };
+        return Results.Created($"/api/doughs/{doughs.Id}", doughsDto);
+    }
 
-            this.doughService.CreateDoughs(dough);
+    [HttpPut("{id}")]
+    public IResult UpdateDough([FromRoute] int id, [FromBody] CreateOrUpdateDoughsDto dto)
+    {
+        Doughs dough = this.doughService.GetDoughs(id);
+        if (dough is null)
+            return Results.NotFound($"Dough not found by id : {id}");
 
-            return Results.Created($"/api/doughs/{dough.Id}", dough);
-        }
+        if (dto.Name != null) dough.Name = dto.Name;
 
-        [HttpPut("{id}")]
-        public IResult UpdateDough([FromRoute] int id, [FromBody] CreateOrUpdateDoughDto dto)
-        {
-            Doughs dough = this.doughService.GetDoughs(id);
-            if (dough is null)
-                return Results.NotFound($"Dough not found by id : {id}");
+        this.doughService.UpdateDoughs(dough);
 
-            if (dto.Name != null) dough.Name = dto.Name;
+        return Results.NoContent();
+    }
 
-            this.doughService.UpdateDoughs(dough);
+    [HttpDelete("{id}")]
+    public async Task<IResult> DeleteDough(int id)
+    {
+        Doughs dough = this.doughService.GetDoughs(id);
+        if (dough is null)
+            return Results.NotFound($"Dough not found by id : {id}");
 
-            return Results.NoContent();
-        }
+        this.doughService.DeleteDoughs(dough);
 
-        [HttpDelete("{id}")]
-        public async Task<IResult> DeleteDough(int id)
-        {
-            Doughs dough = this.doughService.GetDoughs(id);
-            if (dough is null)
-                return Results.NotFound($"Dough not found by id : {id}");
-
-            this.doughService.DeleteDoughs(dough);
-
-            return Results.NoContent();
-        }
+        return Results.NoContent();
     }
 }
