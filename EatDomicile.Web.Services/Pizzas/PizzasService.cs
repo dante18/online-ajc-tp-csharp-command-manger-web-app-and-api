@@ -30,7 +30,7 @@ public class PizzasService
         _ = response.EnsureSuccessStatusCode();
     }
 
-    public async Task UpdatePizzaAsync(int id, PizzaDTO pizzaDTO)
+    public async Task UpdatePizzaAsync(int id, CreatePizzaDTO pizzaDTO)
     {
         var response = await this.httpClient.PutAsJsonAsync($"https://localhost:7001/api/pizzas/{id}", pizzaDTO);
         _ = response.EnsureSuccessStatusCode();

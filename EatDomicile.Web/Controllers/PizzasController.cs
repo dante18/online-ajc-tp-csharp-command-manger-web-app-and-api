@@ -92,6 +92,8 @@ public class PizzasController : Controller
     public async Task<ActionResult> Edit(int id)
     {
         var pizza = await this.pizzasService.GetPizzaAsync(id);
+        var doughs = await this.doughService.GetDoughsAsync();
+
         if (pizza is null)
         {
             return this.NotFound();
@@ -101,7 +103,8 @@ public class PizzasController : Controller
         {
             Name = pizza.Name,
             Price = pizza.Price,
-            Doughs = pizza.Doughs,
+            DoughsList = doughs.Select(dough => new SelectListItem(dough.Name, dough.Id.ToString())).ToList(),
+            DoughId = pizza.Doughs.Id,
             Vegetarian = pizza.Vegetarian
         };
 
@@ -111,18 +114,18 @@ public class PizzasController : Controller
     // POST PizzasController/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Edit(int id, [Bind("Id,Name,Price,Fizzy,KCal")] PizzaEditViewModel pizzaEditViewModel)
+    public async Task<ActionResult> Edit(int id, [Bind("Name,Price,DoughId,Vegetarian")] PizzaEditViewModel pizzaEditViewModel)
     {
         if (!this.ModelState.IsValid)
             return this.View(pizzaEditViewModel);
 
         try
         {
-            var editPizza = new PizzaDTO()
+            var editPizza = new CreatePizzaDTO()
             {
                 Name = pizzaEditViewModel.Name,
                 Price = pizzaEditViewModel.Price,
-                Doughs = pizzaEditViewModel.Doughs,
+                DoughsId = pizzaEditViewModel.DoughId,
                 Vegetarian = pizzaEditViewModel.Vegetarian
             };
 
