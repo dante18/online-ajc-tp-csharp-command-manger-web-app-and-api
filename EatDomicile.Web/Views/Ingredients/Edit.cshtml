@@ -1,21 +1,22 @@
-﻿@model EatDomicile.Web.ViewModels.Drinks.DrinkEditViewModel
+﻿@model EatDomicile.Web.ViewModels.Ingredients.IngredientEditViewModel
 
 @{
-    ViewData["Title"] = "Modifier boissons";
+    ViewData["Title"] = "Modifier ingrédient";
 }
 
 <div class="row">
     <div class="col-6 d-flex align-items-center justify-content-start mt-3">
-        <h1>Modifier une boisson</h1>
+        <h1>Modifier un ingrédient</h1>
     </div>
     <div class="col-6 d-flex align-items-center justify-content-end">
-        <a asp-action="Index" class="btn btn-primary">Annuler et retourner sur la liste des boissons</a>
+        <a asp-action="Index" class="btn btn-primary">Annuler et retourner sur la liste des ingrédients</a>
     </div>
 </div>
 <div class="row">
     <div class="col-12 d-flex align-items-center justify-content-start">
-        <form asp-action="Edit">
+        <form asp-action="Edit" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
@@ -26,18 +27,13 @@
                 <input asp-for="KCal" class="form-control" />
                 <span asp-validation-for="KCal" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
-            </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Fizzy" /> @Html.DisplayNameFor(model => model.Fizzy)
+                    <input class="form-check-input" asp-for="IsAllergen" /> @Html.DisplayNameFor(model => model.IsAllergen)
                 </label>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save changes" class="btn btn-primary" />
+                <input type="submit" value="Ajouter" class="btn btn-primary" />
             </div>
         </form>
     </div>
