@@ -1,20 +1,20 @@
-﻿@model EatDomicile.Web.ViewModels.Pizzas.PizzaViewModel
+﻿@model EatDomicile.Web.ViewModels.Pastas.PastaViewModel
 
 @{
-    ViewData["Title"] = "Supprimer pizza";
+    ViewData["Title"] = "Supprimer pasta";
 }
 
 <div class="row">
     <div class="col-6 d-flex align-items-center justify-content-start mt-3">
-        <h1>Supprimer une pizza</h1>
+        <h1>Supprimer une boisson</h1>
     </div>
     <div class="col-6 d-flex align-items-center justify-content-end">
-        <a asp-action="Index" class="btn btn-primary">Annuler et retourner sur la liste des pizzas</a>
+        <a asp-action="Index" class="btn btn-primary">Annuler et retourner sur la liste des pastas</a>
     </div>
 </div>
 <div class="row">
     <div class="col-12 d-flex align-items-center justify-content-start">
-        <h3>Êtes-vous sûr de vouloir supprimer cette pizza ?</h3>
+        <h3>Êtes-vous sûr de vouloir supprimer cette pasta ?</h3>
     </div>
 </div>
 <div class="row">
@@ -33,10 +33,16 @@
                 @(Model.Price)€
             </dd>
             <dt class="col-sm-4">
+                Type :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Type)
+            </dd>
+            <dt class="col-sm-4">
                 KCal :
             </dt>
             <dd class="col-sm-8">
-                @(Model.Doughs)
+                @(Model.KCal)
             </dd>
             <dt class="col-sm-4">
                 Végétarien

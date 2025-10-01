@@ -1,20 +1,16 @@
-﻿@model EatDomicile.Web.ViewModels.Pizzas.PizzaViewModel
+﻿@model EatDomicile.Web.ViewModels.Pastas.PastaDetailsViewModel
 
 @{
-    ViewData["Title"] = "Supprimer pizza";
+    ViewData["Title"] = "Détail pastas";
 }
 
 <div class="row">
     <div class="col-6 d-flex align-items-center justify-content-start mt-3">
-        <h1>Supprimer une pizza</h1>
+        <h1>Détail d'une pasta</h1>
     </div>
     <div class="col-6 d-flex align-items-center justify-content-end">
-        <a asp-action="Index" class="btn btn-primary">Annuler et retourner sur la liste des pizzas</a>
-    </div>
-</div>
-<div class="row">
-    <div class="col-12 d-flex align-items-center justify-content-start">
-        <h3>Êtes-vous sûr de vouloir supprimer cette pizza ?</h3>
+        <a asp-action="Index" class="btn btn-primary">Retourner sur la liste des pastas</a>
+        <a asp-action="Edit" asp-route-id="@(Model.Id) " class="btn btn-warning ms-2">Modifier la pasta</a>
     </div>
 </div>
 <div class="row">
@@ -33,10 +29,16 @@
                 @(Model.Price)€
             </dd>
             <dt class="col-sm-4">
+                Type :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Type)
+            </dd>
+            <dt class="col-sm-4">
                 KCal :
             </dt>
             <dd class="col-sm-8">
-                @(Model.Doughs)
+                @(Model.KCal)
             </dd>
             <dt class="col-sm-4">
                 Végétarien
@@ -45,17 +47,5 @@
                 @(Model.Vegetarian ? "Oui" : "Non")
             </dd>
         </dl>
-    </div>
-</div>
-<div class="row">
-    <div class="col-12 d-flex align-items-center justify-content-start">
-        <div>
-            <form asp-action="DeleteConfirmed" method="post">
-                <input type="hidden" asp-for="Id" />
-                <div class="form-group">
-                    <input type="submit" value="Supprimer" class="btn btn-danger" />
-                </div>
-            </form>
-        </div>
     </div>
 </div>

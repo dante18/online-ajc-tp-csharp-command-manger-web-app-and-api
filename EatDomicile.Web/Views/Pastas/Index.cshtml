@@ -1,0 +1,46 @@
+﻿@model IEnumerable<EatDomicile.Web.ViewModels.Pastas.PastaViewModel>
+
+@{
+    ViewData["Title"] = "Pastas";
+}
+
+<div class="row">
+    <div class="col-6 d-flex align-items-center justify-content-start">
+        <h1>Liste des pastas</h1>
+    </div>
+    <div class="col-6 d-flex align-items-center justify-content-end">
+        <a asp-action="Create" class="btn btn-primary">Ajouter une pasta</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 table-responsive mt-3">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th class="text-center">Nom</th>
+                    <th class="text-center">Prix</th>
+                    <th class="text-center">Type</th>
+                    <th class="text-center">KCal</th>
+                    <th class="text-center">Végétarien</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var drink in Model)
+                {
+                    <tr>
+                        <td class="text-center">@drink.Name</td>
+                        <td class="text-center">@drink.Price</td>
+                        <td class="text-center">@drink.Type</td>
+                        <td class="text-center">@drink.KCal</td>
+                        <td class="text-center">@(drink.Vegetarian ? "Oui" : "Non")</td>
+                        <td class="text-center">
+                            <a asp-action="Details" asp-route-id="@drink.Id" class="btn btn-info">Détail</a>
+                            <a asp-action="Edit" asp-route-id="@drink.Id" class="btn btn-warning">Modifier</a>
+                            <a asp-action="Delete" asp-route-id="@drink.Id" class="btn btn-danger">Supprimer</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
