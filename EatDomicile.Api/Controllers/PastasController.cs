@@ -1,87 +1,114 @@
-﻿using EatDomicile.Api.Dtos.Drink;
-using EatDomicile.Api.Dtos.Pasta;
+﻿using EatDomicile.Api.Dtos.Pasta;
 using EatDomicile.Core.Entities;
 using EatDomicile.Core.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace EatDomicile.Api.Controllers
+namespace EatDomicile.Api.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class PastasController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class PastasController : ControllerBase
+    private readonly PastaService pastaService;
+
+    public PastasController(PastaService pastaService)
     {
-        private readonly PastaService pastaService;
+        this.pastaService = pastaService;
+    }
 
-        public PastasController(PastaService pastaService)
+    [HttpGet]
+    public IResult GetPastas()
+    {
+        List<PastaDto> pastas = this.pastaService.GetAllPastas().Select(p => new PastaDto()
         {
-            this.pastaService = pastaService;
-        }
+            Id = p.Id,
+            Name = p.Name,
+            Price = p.Price,
+            Type = p.Type,
+            KCal = p.KCal,
+            Vegetarian = p.Vegetarian,
+        }).ToList();
 
-        [HttpGet]
-        public IResult GetPastas()
+        return Results.Ok(pastas);
+    }
+
+    [HttpGet("{id}")]
+    public IResult GetPasta([FromRoute] int id)
+    {
+        Pasta pasta = this.pastaService.GetPasta(id);
+        if (pasta is null)
+            return Results.NotFound($"Pasta not found by id : {id}");
+
+        PastaDto pastaDto = new PastaDto()
         {
-            List<Pasta> pastas = this.pastaService.GetAllPastas();
+            Id = pasta.Id,
+            Name = pasta.Name,
+            Price = pasta.Price,
+            Type = pasta.Type,
+            KCal = pasta.KCal,
+            Vegetarian = pasta.Vegetarian,
+        };
 
-            return Results.Ok(pastas);
-        }
+        return Results.Ok(pastaDto);
+    }
 
-        [HttpGet("{id}")]
-        public IResult GetPasta([FromRoute] int id)
+    [HttpPost()]
+    public IResult CreatePasta([FromBody] CreateOrUpdatePastaDto dto)
+    {
+        if (!ModelState.IsValid)
+            return Results.BadRequest(ModelState);
+
+        Pasta pasta = new Pasta()
         {
-            Pasta pasta = this.pastaService.GetPasta(id);
-            if (pasta is null)
-                return Results.NotFound($"Pasta not found by id : {id}");
+            KCal = dto.KCal,
+            Name = dto.Name,
+            Price = dto.Price,
+            Type = dto.Type,
+            Vegetarian = dto.Vegetarian
+        };
 
-            return Results.Ok(pasta);
-        }
+        this.pastaService.CreatePasta(pasta);
 
-        [HttpPost()]
-        public IResult CreatePasta([FromBody] CreateOrUpdatePastaDto dto)
+        PastaDto pastaDto = new PastaDto()
         {
-            if (!ModelState.IsValid)
-                return Results.BadRequest(ModelState);
+            Id = pasta.Id,
+            Name = pasta.Name,
+            Price = pasta.Price,
+            Type = pasta.Type,
+            KCal = pasta.KCal,
+            Vegetarian = pasta.Vegetarian,
+        };
 
-            Pasta pasta = new Pasta()
-            {
-                KCal = dto.KCal,
-                Name = dto.Name,
-                Price = dto.Price,
-                Type = dto.Type
-            };
+        return Results.Created($"/api/pastas/{pasta.Id}", pastaDto);
+    }
 
-            this.pastaService.CreatePasta(pasta);
+    [HttpPut("{id}")]
+    public IResult UpdatePasta([FromRoute] int id, [FromBody] CreateOrUpdatePastaDto dto)
+    {
+        Pasta pasta = this.pastaService.GetPasta(id);
+        if (pasta is null)
+            return Results.NotFound($"Pasta not found by id : {id}");
 
-            return Results.Created($"/api/pastas/{pasta.Id}", pasta);
-        }
-        
-        [HttpPut("{id}")]
-        public IResult UpdatePasta([FromRoute] int id, [FromBody] CreateOrUpdatePastaDto dto)
-        {
-            Pasta pasta = this.pastaService.GetPasta(id);
-            if (pasta is null)
-                return Results.NotFound($"Pasta not found by id : {id}");
+        if (dto.KCal != null) pasta.KCal = dto.KCal;
+        if (dto.Name != null) pasta.Name = dto.Name;
+        if (dto.Price != null) pasta.Price = dto.Price;
+        if (dto.Type != null) pasta.Type = dto.Type;
+        if (dto.Vegetarian != null) pasta.Vegetarian = dto.Vegetarian;
 
-            if (dto.KCal != null) pasta.KCal = dto.KCal;
-            if (dto.Name != null) pasta.Name = dto.Name;
-            if (dto.Price != null) pasta.Price = dto.Price;
-            if (dto.Type != null) pasta.Type = dto.Type;
+        this.pastaService.UpdatePasta(pasta);
 
-            this.pastaService.UpdatePasta(pasta);
+        return Results.NoContent();
+    }
 
-            return Results.NoContent();
-        }
+    [HttpDelete("{id}")]
+    public async Task<IResult> DeletePasta(int id)
+    {
+        Pasta pasta = this.pastaService.GetPasta(id);
+        if (pasta is null)
+            return Results.NotFound($"Pasta not found by id : {id}");
 
-        [HttpDelete("{id}")]
-        public async Task<IResult> DeletePasta(int id)
-        {
-            Pasta pasta = this.pastaService.GetPasta(id);
-            if (pasta is null)
-                return Results.NotFound($"Pasta not found by id : {id}");
+        this.pastaService.DeletePasta(pasta);
 
-            this.pastaService.DeletePasta(pasta);
-
-            return Results.NoContent();
-        }
+        return Results.NoContent();
     }
 }
