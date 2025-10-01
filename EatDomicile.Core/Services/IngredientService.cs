@@ -17,6 +17,16 @@ public sealed class IngredientService
         return _context.Ingredients.ToList();
     }
 
+    public List<Ingredient> GetAllIngredientsByBurger(int burgerId)
+    {
+        return _context.Ingredients.ToList().Where(i => i.BurgerId == burgerId).ToList();
+    }
+
+    public List<Ingredient> GetAllIngredientsByPizza(int pizzaId)
+    {
+        return _context.Ingredients.ToList().Where(i => i.PizzaId == pizzaId).ToList();
+    }
+
     public Ingredient GetIngredient(int id)
     {
         return this._context.Ingredients.Where(i => i.Id == id).FirstOrDefault();

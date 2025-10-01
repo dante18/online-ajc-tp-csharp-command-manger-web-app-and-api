@@ -1,13 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace EatDomicile.Api.Dtos.Ingredient;
 
-namespace EatDomicile.Api.Dtos.Ingredient
+public class IngredientDto
 {
-    public class IngredientDto
-    {
-        public decimal KCal { get; set; }
+    public int? Id { get; set; }
 
-        public string Name { get; set; }
+    public string Name { get; set; }
 
-        public bool IsAllergen { get; set; }
-    }
+    public decimal KCal { get; set; }
+
+    public bool IsAllergen { get; set; }
 }
