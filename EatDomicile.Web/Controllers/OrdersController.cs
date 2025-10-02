@@ -1,7 +1,7 @@
-﻿using EatDomicile.Web.Services.Addresses.DTO;
+﻿using EatDomicile.Web.Services.Domains.Addresses.DTO;
+using EatDomicile.Web.Services.Domains.Orders.DTO;
+using EatDomicile.Web.Services.Domains.Users.DTO;
 using EatDomicile.Web.Services.Interfaces;
-using EatDomicile.Web.Services.Orders.DTO;
-using EatDomicile.Web.Services.Users.DTO;
 using EatDomicile.Web.ViewModels.Orders;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -140,7 +140,8 @@ public class OrdersController : Controller
         }
         catch
         {
-            return this.View();
+            TempData["ErrorMessage"] = "Echec de la création de la commande";
+            return RedirectToAction(nameof(Index));
         }
     }
 
@@ -201,7 +202,8 @@ public class OrdersController : Controller
         }
         catch
         {
-            return this.View();
+            TempData["ErrorMessage"] = "Echec de la modification de la commande";
+            return RedirectToAction(nameof(Index));
         }
     }
 
@@ -268,7 +270,8 @@ public class OrdersController : Controller
         }
         catch
         {
-            return this.View(nameof(this.Index));
+            TempData["ErrorMessage"] = "Echec de la suppréssion de la commande";
+            return RedirectToAction(nameof(Index));
         }
     }
 

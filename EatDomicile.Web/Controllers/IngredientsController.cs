@@ -1,4 +1,4 @@
-﻿using EatDomicile.Web.Services.Ingredient.DTO;
+﻿using EatDomicile.Web.Services.Domains.Ingredients.DTO;
 using EatDomicile.Web.Services.Interfaces;
 using EatDomicile.Web.ViewModels.Ingredients;
 using Microsoft.AspNetCore.Mvc;
@@ -30,20 +30,28 @@ public class IngredientsController : Controller
     // GET: IngredientsController/Details/5
     public async Task<IActionResult> Details(int id)
     {
-        var ingredient = await this.ingredientService.GetIngredientAsync(id);
-
-        if (ingredient is null)
+        try
         {
-            return this.NotFound();
+            var ingredient = await this.ingredientService.GetIngredientAsync(id);
+
+            if (ingredient is null)
+            {
+                return this.NotFound();
+            }
+
+            return this.View(new IngredientDetailsViewModel()
+            {
+                Id = ingredient.Id,
+                Name = ingredient.Name,
+                KCal = ingredient.KCal,
+                IsAllergen = ingredient.IsAllergen
+            });
         }
-
-        return this.View(new IngredientDetailsViewModel()
+        catch (Exception e)
         {
-            Id = ingredient.Id,
-            Name = ingredient.Name,
-            KCal = ingredient.KCal,
-            IsAllergen = ingredient.IsAllergen
-        });
+            TempData["ErrorMessage"] = "L'ingrédient n'existe pas ou a été supprimé!";
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     public IActionResult Create()
@@ -74,28 +82,37 @@ public class IngredientsController : Controller
         }
         catch
         {
-            return this.View();
+            TempData["ErrorMessage"] = "Echec de la création de l'ingrédient";
+            return RedirectToAction(nameof(Index));
         }
     }
 
     public async Task<ActionResult> Edit(int id)
     {
-        var ingredient = await this.ingredientService.GetIngredientAsync(id);
-
-        if (ingredient is null)
+        try
         {
-            return this.NotFound();
+            var ingredient = await this.ingredientService.GetIngredientAsync(id);
+
+            if (ingredient is null)
+            {
+                return this.NotFound();
+            }
+
+            var ingredientEditViewModel = new IngredientEditViewModel
+            {
+                Id = ingredient.Id,
+                Name = ingredient.Name,
+                KCal = ingredient.KCal,
+                IsAllergen = ingredient.IsAllergen,
+            };
+
+            return this.View(ingredientEditViewModel);
         }
-
-        var ingredientEditViewModel = new IngredientEditViewModel
+        catch (Exception e)
         {
-            Id = ingredient.Id,
-            Name = ingredient.Name,
-            KCal = ingredient.KCal,
-            IsAllergen = ingredient.IsAllergen,
-        };
-
-        return this.View(ingredientEditViewModel);
+            TempData["ErrorMessage"] = "L'ingrédient n'existe pas ou a été supprimé!";
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     // POST: IngredientsController/Edit/5
@@ -122,28 +139,37 @@ public class IngredientsController : Controller
         }
         catch
         {
-            return this.View();
+            TempData["ErrorMessage"] = "Echec de la modification de l'ingrédient";
+            return RedirectToAction(nameof(Index));
         }
     }
 
     public async Task<ActionResult> Delete(int id)
     {
-        var ingredient = await this.ingredientService.GetIngredientAsync(id);
-
-        if (ingredient is null)
+        try
         {
-            return this.NotFound();
+            var ingredient = await this.ingredientService.GetIngredientAsync(id);
+
+            if (ingredient is null)
+            {
+                return this.NotFound();
+            }
+
+            var ingredientFound = new IngredientViewModel
+            {
+                Id = ingredient.Id,
+                Name = ingredient.Name,
+                KCal = ingredient.KCal,
+                IsAllergen = ingredient.IsAllergen
+            };
+
+            return this.View(ingredientFound);
         }
-
-        var ingredientFound = new IngredientViewModel
+        catch (Exception e)
         {
-            Id = ingredient.Id,
-            Name = ingredient.Name,
-            KCal = ingredient.KCal,
-            IsAllergen = ingredient.IsAllergen
-        };
-
-        return this.View(ingredientFound);
+            TempData["ErrorMessage"] = "L'ingrédient n'existe pas ou a été supprimé!";
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     // POST: DrinksController/Delete/5
@@ -158,7 +184,8 @@ public class IngredientsController : Controller
         }
         catch
         {
-            return this.View(nameof(this.Details));
+            TempData["ErrorMessage"] = "Echec de la suppréssion de l'ingrédient";
+            return RedirectToAction(nameof(Index));
         }
     }
 }

@@ -1,0 +1,51 @@
+﻿@model EatDomicile.Web.ViewModels.Users.UsersDetailsViewModel
+
+@{
+    ViewData["Title"] = "Détail utilisateur";
+}
+
+<div class="row">
+    <div class="col-6 d-flex align-items-center justify-content-start mt-3">
+        <h1>Détail d'un utilisateur</h1>
+    </div>
+    <div class="col-6 d-flex align-items-center justify-content-end">
+        <a asp-action="Index" class="btn btn-primary">Retourner sur la liste des utilisateurs</a>
+        <a asp-action="Edit" asp-route-id="@(Model.User.Id) " class="btn btn-warning ms-2">Modifier l'utilisateur</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-start">
+        <dl class="row">
+            <dt class="col-sm-4">
+                Nom :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.User.LastName)
+            </dd>
+            <dt class="col-sm-4">
+                Prénom :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.User.FirstName)
+            </dd>
+            <dt class="col-sm-4">
+                Numéro de téléphone
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.User.Phone)
+            </dd>
+            <dt class="col-sm-4">
+                Adresse mail :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.User.Mail)
+            </dd>
+            <dt class="col-sm-4">
+                Adresse postal :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Address.Street) @(Model.Address.Zip) @(Model.Address.City), @(Model.Address.State) @(Model.Address.Country)
+            </dd>
+        </dl>
+    </div>
+</div>

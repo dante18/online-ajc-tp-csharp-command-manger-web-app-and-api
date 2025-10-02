@@ -1,4 +1,4 @@
-﻿using EatDomicile.Web.Services.Ingredient.DTO;
+﻿using EatDomicile.Web.Services.Domains.Ingredients.DTO;
 
 namespace EatDomicile.Web.Services.Interfaces;
 

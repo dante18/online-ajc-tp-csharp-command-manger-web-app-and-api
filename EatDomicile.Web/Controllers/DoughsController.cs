@@ -1,4 +1,4 @@
-﻿using EatDomicile.Web.Services.Doughs.DTO;
+﻿using EatDomicile.Web.Services.Domains.Doughs.DTO;
 using EatDomicile.Web.Services.Interfaces;
 using EatDomicile.Web.ViewModels.Doughs;
 using Microsoft.AspNetCore.Mvc;
@@ -28,18 +28,26 @@ public class DoughsController : Controller
     //GET DoughsController/Details/id
     public async Task<IActionResult> Details(int id)
     {
-        var dough = await this.doughsService.GetDoughAsync(id);
-
-        if (dough is null)
+        try
         {
-            return this.NotFound();
+            var dough = await this.doughsService.GetDoughAsync(id);
+
+            if (dough is null)
+            {
+                return this.NotFound();
+            }
+
+            return this.View(new DoughDetailsViewModel()
+            {
+                Id = dough.Id,
+                Name = dough.Name
+            });
         }
-
-        return this.View(new DoughDetailsViewModel()
+        catch (Exception e)
         {
-            Id = dough.Id,
-            Name = dough.Name
-        });
+            TempData["ErrorMessage"] = "La pâte n'existe pas ou a été supprimé!";
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     public IActionResult Create()
@@ -68,26 +76,35 @@ public class DoughsController : Controller
         }
         catch
         {
-            return this.View();
+            TempData["ErrorMessage"] = "Echec de la création de la pâte";
+            return RedirectToAction(nameof(Index));
         }
     }
 
     public async Task<ActionResult> Edit(int id)
     {
-        var dough = await this.doughsService.GetDoughAsync(id);
-
-        if (dough is null)
+        try
         {
-            return this.NotFound();
+            var dough = await this.doughsService.GetDoughAsync(id);
+
+            if (dough is null)
+            {
+                return this.NotFound();
+            }
+
+            var doughEditViewModel = new DoughEditViewModel
+            {
+                Id = dough.Id,
+                Name = dough.Name
+            };
+
+            return this.View(doughEditViewModel);
         }
-
-        var doughEditViewModel = new DoughEditViewModel
+        catch (Exception e)
         {
-            Id = dough.Id,
-            Name = dough.Name
-        };
-
-        return this.View(doughEditViewModel);
+            TempData["ErrorMessage"] = "La pâte n'existe pas ou a été supprimé!";
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     // POST: DoughsController/Edit/5
@@ -112,26 +129,35 @@ public class DoughsController : Controller
         }
         catch
         {
-            return this.View();
+            TempData["ErrorMessage"] = "Echec de la modification de la pâte";
+            return RedirectToAction(nameof(Index));
         }
     }
 
     public async Task<ActionResult> Delete(int id)
     {
-        var dough = await this.doughsService.GetDoughAsync(id);
-
-        if (dough is null)
+        try
         {
-            return this.NotFound();
+            var dough = await this.doughsService.GetDoughAsync(id);
+
+            if (dough is null)
+            {
+                return this.NotFound();
+            }
+
+            var doughFound = new DoughViewModel
+            {
+                Id = dough.Id,
+                Name = dough.Name
+            };
+
+            return this.View(doughFound);
         }
-
-        var doughFound = new DoughViewModel
+        catch (Exception e)
         {
-            Id = dough.Id,
-            Name = dough.Name
-        };
-
-        return this.View(doughFound);
+            TempData["ErrorMessage"] = "La pâte n'existe pas ou a été supprimé!";
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     // POST: DoughsController/Delete/5
@@ -146,7 +172,8 @@ public class DoughsController : Controller
         }
         catch
         {
-            return this.View(nameof(this.Details));
+            TempData["ErrorMessage"] = "Echec de la suppréssion de la pâte";
+            return RedirectToAction(nameof(Index));
         }
     }
 }

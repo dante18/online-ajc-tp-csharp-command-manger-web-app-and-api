@@ -6,16 +6,16 @@ namespace EatDomicile.Web.ViewModels.Users
     {
         public int? Id { get; set; }
 
-        [DisplayName("FirstName")]
+        [DisplayName("Prénom")]
         public string FirstName { get; set; }
 
-        [DisplayName("LastName")]
+        [DisplayName("Nom")]
         public string LastName { get; set; }
 
-        [DisplayName("Phone")]
+        [DisplayName("Téléphone")]
         public string Phone { get; set; }
 
-        [DisplayName("Mail")]
+        [DisplayName("Email")]
         public string Mail { get; set; }
 
         [DisplayName("Rue")]

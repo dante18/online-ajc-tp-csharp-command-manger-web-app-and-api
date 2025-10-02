@@ -1,5 +1,5 @@
-﻿using EatDomicile.Web.Services.Burgers.DTO;
-using EatDomicile.Web.Services.Ingredient.DTO;
+﻿using EatDomicile.Web.Services.Domains.Burgers.DTO;
+using EatDomicile.Web.Services.Domains.Ingredients.DTO;
 using EatDomicile.Web.Services.Interfaces;
 using EatDomicile.Web.ViewModels.Burgers;
 using EatDomicile.Web.ViewModels.Ingredients;
@@ -36,28 +36,36 @@ public class BurgersController : Controller
     // GET: BurgersController/Details/5
     public async Task<IActionResult> Details(int id)
     {
-        var burger = await this.burgerService.GetBurgerAsync(id);
-
-        if (burger is null)
+        try
         {
-            return this.NotFound();
+            var burger = await this.burgerService.GetBurgerAsync(id);
+
+            if (burger is null)
+            {
+                return this.NotFound();
+            }
+
+            BurgerDTO burgerDto = new BurgerDTO()
+            {
+                Id = burger.Id,
+                Name = burger.Name,
+                Price = burger.Price,
+                Vegetarian = burger.Vegetarian
+            };
+
+            var ingredients = await this.burgerService.GetBurgerIngredientsAsync(id);
+
+            return this.View(new BurgerDetailsViewModel()
+            {
+                Burger = burgerDto,
+                Ingredients = ingredients
+            });
         }
-
-        BurgerDTO burgerDto = new BurgerDTO()
+        catch (Exception e)
         {
-            Id = burger.Id,
-            Name = burger.Name,
-            Price = burger.Price,
-            Vegetarian = burger.Vegetarian
-        };
-
-        var ingredients = await this.burgerService.GetBurgerIngredientsAsync(id);
-
-        return this.View(new BurgerDetailsViewModel()
-        {
-            Burger = burgerDto,
-            Ingredients = ingredients
-        });
+            TempData["ErrorMessage"] = "Le burger n'existe pas ou a été supprimé!";
+            return RedirectToAction(nameof(Index));
+        }
     }
 
 
@@ -77,7 +85,7 @@ public class BurgersController : Controller
 
         try
         {
-            var newBurger = new BurgerDTO
+            var newBurger = new CreateOrUpdateBurgerDTO
             {
                 Name = burgerCreateViewModel.Name,
                 Price = burgerCreateViewModel.Price,
@@ -89,29 +97,37 @@ public class BurgersController : Controller
         }
         catch
         {
-            return this.View();
+            TempData["ErrorMessage"] = "Echec de la création du burger";
+            return RedirectToAction(nameof(Index));
         }
     }
 
-
     public async Task<ActionResult> Edit(int id)
     {
-        var burger = await this.burgerService.GetBurgerAsync(id);
-
-        if (burger is null)
+        try
         {
-            return this.NotFound();
+            var burger = await this.burgerService.GetBurgerAsync(id);
+
+            if (burger is null)
+            {
+                return this.NotFound();
+            }
+
+            var burgerEditViewModel = new BurgerEditViewModel
+            {
+                Id = burger.Id,
+                Name = burger.Name,
+                Price = burger.Price,
+                Vegetarian = burger.Vegetarian,
+            };
+
+            return this.View(burgerEditViewModel);
         }
-
-        var burgerEditViewModel = new BurgerEditViewModel
+        catch
         {
-            Id = burger.Id,
-            Name = burger.Name,
-            Price = burger.Price,
-            Vegetarian = burger.Vegetarian,
-        };
-
-        return this.View(burgerEditViewModel);
+            TempData["ErrorMessage"] = "Le burger n'existe pas ou a été supprimé!";
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     // POST: BurgersController/Edit/5
@@ -138,28 +154,37 @@ public class BurgersController : Controller
         }
         catch
         {
-            return this.View();
+            TempData["ErrorMessage"] = "Echec de la modification du burger";
+            return RedirectToAction(nameof(Index));
         }
     }
 
     public async Task<ActionResult> Delete(int id)
     {
-        var burger = await this.burgerService.GetBurgerAsync(id);
-
-        if (burger is null)
+        try
         {
-            return this.NotFound();
+            var burger = await this.burgerService.GetBurgerAsync(id);
+
+            if (burger is null)
+            {
+                return this.NotFound();
+            }
+
+            var burgerFound = new BurgerViewModel
+            {
+                Id = burger.Id,
+                Name = burger.Name,
+                Price = burger.Price,
+                Vegetarian = burger.Vegetarian
+            };
+
+            return this.View(burgerFound);
         }
-
-        var burgerFound = new BurgerViewModel
+        catch (Exception e)
         {
-            Id = burger.Id,
-            Name = burger.Name,
-            Price = burger.Price,
-            Vegetarian = burger.Vegetarian
-        };
-
-        return this.View(burgerFound);
+            TempData["ErrorMessage"] = "Le burger n'existe pas ou a été supprimé!";
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     // POST: DrinksController/Delete/5
@@ -174,7 +199,8 @@ public class BurgersController : Controller
         }
         catch
         {
-            return this.View(nameof(this.Details));
+            TempData["ErrorMessage"] = "Echec de la suppression du burger";
+            return RedirectToAction(nameof(Index));
         }
     }
 

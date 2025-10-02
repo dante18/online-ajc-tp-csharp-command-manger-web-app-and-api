@@ -1,16 +1,20 @@
 ﻿@model EatDomicile.Web.ViewModels.Ingredients.IngredientViewModel
 
 @{
-    ViewData["Title"] = "Détail ingrédient";
+    ViewData["Title"] = "Supprimer ingrédient";
 }
 
 <div class="row">
     <div class="col-6 d-flex align-items-center justify-content-start mt-3">
-        <h1>Détail d'un ingrédient</h1>
+        <h1>Supprimer un ingrédient</h1>
     </div>
     <div class="col-6 d-flex align-items-center justify-content-end">
-        <a asp-action="Index" class="btn btn-primary">Retourner sur la liste des ingrédient</a>
-        <a asp-action="Edit" asp-route-id="@(Model.Id) " class="btn btn-warning ms-2">Modifier l'ingrédient</a>
+        <a asp-action="Index" class="btn btn-primary">Annuler et retourner sur la liste des ingrédients</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-start">
+        <h3>Êtes-vous sûr de vouloir supprimer cet ingrédient ?</h3>
     </div>
 </div>
 <div class="row">

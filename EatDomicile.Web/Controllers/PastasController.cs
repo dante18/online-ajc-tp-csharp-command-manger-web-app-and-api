@@ -1,9 +1,7 @@
-﻿using EatDomicile.Web.Services.Interfaces;
-using EatDomicile.Web.Services.Pastas.DTO;
+﻿using EatDomicile.Web.Services.Domains.Pastas.DTO;
+using EatDomicile.Web.Services.Interfaces;
 using EatDomicile.Web.ViewModels.Pastas;
 using Microsoft.AspNetCore.Mvc;
-
-namespace EatDomicile.Web.Controllers;
 
 public class PastasController : Controller
 {
@@ -32,22 +30,30 @@ public class PastasController : Controller
     //GET PastasController/Details/id
     public async Task<IActionResult> Details(int id)
     {
-        var pasta = await this.pastasService.GetPastaAsync(id);
-
-        if (pasta is null)
+        try
         {
-            return this.NotFound();
+            var pasta = await this.pastasService.GetPastaAsync(id);
+
+            if (pasta is null)
+            {
+                return this.NotFound();
+            }
+
+            return this.View(new PastaDetailsViewModel()
+            {
+                Id = pasta.Id,
+                Name = pasta.Name,
+                Price = pasta.Price,
+                Type = pasta.Type,
+                KCal = pasta.KCal,
+                Vegetarian = pasta.Vegetarian,
+            });
         }
-
-        return this.View(new PastaDetailsViewModel()
+        catch (Exception e)
         {
-            Id = pasta.Id,
-            Name = pasta.Name,
-            Price = pasta.Price,
-            Type = pasta.Type,
-            KCal = pasta.KCal,
-            Vegetarian = pasta.Vegetarian,
-        });
+            TempData["ErrorMessage"] = "La pasta n'existe pas ou a été supprimé!";
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     public IActionResult Create()
@@ -80,30 +86,39 @@ public class PastasController : Controller
         }
         catch
         {
-            return this.View();
+            TempData["ErrorMessage"] = "Echec de la création de la pasta";
+            return RedirectToAction(nameof(Index));
         }
     }
 
     public async Task<ActionResult> Edit(int id)
     {
-        var pasta = await this.pastasService.GetPastaAsync(id);
-
-        if (pasta is null)
+        try
         {
-            return this.NotFound();
+            var pasta = await this.pastasService.GetPastaAsync(id);
+
+            if (pasta is null)
+            {
+                return this.NotFound();
+            }
+
+            var pastaEditViewModel = new PastaEditViewModel
+            {
+                Id = pasta.Id,
+                Name = pasta.Name,
+                Price = pasta.Price,
+                Type = pasta.Type,
+                KCal = pasta.KCal,
+                Vegetarian = pasta.Vegetarian,
+            };
+
+            return this.View(pastaEditViewModel);
         }
-
-        var pastaEditViewModel = new PastaEditViewModel
+        catch (Exception e)
         {
-            Id = pasta.Id,
-            Name = pasta.Name,
-            Price = pasta.Price,
-            Type = pasta.Type,
-            KCal = pasta.KCal,
-            Vegetarian = pasta.Vegetarian,
-        };
-
-        return this.View(pastaEditViewModel);
+            TempData["ErrorMessage"] = "La pasta n'existe pas ou a été supprimé!";
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     // POST: PastasController/Edit/5
@@ -132,30 +147,39 @@ public class PastasController : Controller
         }
         catch
         {
-            return this.View();
+            TempData["ErrorMessage"] = "Echec de la modification de la pasta";
+            return RedirectToAction(nameof(Index));
         }
     }
 
     public async Task<ActionResult> Delete(int id)
     {
-        var pasta = await this.pastasService.GetPastaAsync(id);
-
-        if (pasta is null)
+        try
         {
-            return this.NotFound();
+            var pasta = await this.pastasService.GetPastaAsync(id);
+
+            if (pasta is null)
+            {
+                return this.NotFound();
+            }
+
+            var pastaFound = new PastaViewModel
+            {
+                Id = pasta.Id,
+                Name = pasta.Name,
+                Price = pasta.Price,
+                Type = pasta.Type,
+                KCal = pasta.KCal,
+                Vegetarian = pasta.Vegetarian,
+            };
+
+            return this.View(pastaFound);
         }
-
-        var pastaFound = new PastaViewModel
+        catch (Exception e)
         {
-            Id = pasta.Id,
-            Name = pasta.Name,
-            Price = pasta.Price,
-            Type = pasta.Type,
-            KCal = pasta.KCal,
-            Vegetarian = pasta.Vegetarian,
-        };
-
-        return this.View(pastaFound);
+            TempData["ErrorMessage"] = "La pasta n'existe pas ou a été supprimé!";
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     // POST: PastasController/Delete/5
@@ -170,7 +194,8 @@ public class PastasController : Controller
         }
         catch
         {
-            return this.View(nameof(this.Details));
+            TempData["ErrorMessage"] = "Echec de la suppression de la pasta";
+            return RedirectToAction(nameof(Index));
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using EatDomicile.Web.Services.Pastas.DTO;
+﻿using EatDomicile.Web.Services.Domains.Pastas.DTO;
 
 namespace EatDomicile.Web.Services.Interfaces;
 

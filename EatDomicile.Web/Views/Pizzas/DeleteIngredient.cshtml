@@ -1,0 +1,58 @@
+﻿@model EatDomicile.Web.ViewModels.Pizzas.PizzaIngredientViewModel
+
+@{
+    ViewData["Title"] = "Pizza - Suppression ingrédient";
+}
+
+<div class="row">
+    <div class="col-6 d-flex align-items-center justify-content-start mt-3">
+        <h1>Suppression l'ingrédient d'une pizza @(ViewData["pizzaSelected"])</h1>
+    </div>
+    <div class="col-6 d-flex align-items-center justify-content-end">
+        <a asp-action="Details"
+           asp-route-id="@(ViewData["pizzaSelectedId"])"
+           class="btn btn-primary">Annuler et retourner sur le detail d'une pizza</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-start">
+        <h3>Êtes-vous sûr de vouloir supprimer cette ingredient d'une pizza ?</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-start">
+        <dl class="row">
+            <dt class="col-sm-4">
+                Nom :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Name)
+            </dd>
+            <dt class="col-sm-4">
+                KCal :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.KCal)
+            </dd>
+            <dt class="col-sm-4">
+                Allergène
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.IsAllergen ? "Oui" : "Non")
+            </dd>
+        </dl>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-start">
+        <div>
+            <form asp-action="DeleteIngredientConfirmed" method="post">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="PizzaId"/>
+                <div class="form-group">
+                    <input type="submit" value="Supprimer" class="btn btn-danger" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,12 +1,12 @@
-using EatDomicile.Web.Services.Burgers;
-using EatDomicile.Web.Services.Doughs;
-using EatDomicile.Web.Services.Drinks;
-using EatDomicile.Web.Services.Ingredients;
+using EatDomicile.Web.Services.Domains.Burgers;
+using EatDomicile.Web.Services.Domains.Doughs;
+using EatDomicile.Web.Services.Domains.Drinks;
+using EatDomicile.Web.Services.Domains.Ingredients;
+using EatDomicile.Web.Services.Domains.Orders;
+using EatDomicile.Web.Services.Domains.Pastas;
+using EatDomicile.Web.Services.Domains.Pizzas;
+using EatDomicile.Web.Services.Domains.Users;
 using EatDomicile.Web.Services.Interfaces;
-using EatDomicile.Web.Services.Orders;
-using EatDomicile.Web.Services.Pastas;
-using EatDomicile.Web.Services.Pizzas;
-using EatDomicile.Web.Services.Users;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);

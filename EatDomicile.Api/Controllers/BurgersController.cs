@@ -74,6 +74,7 @@ public class BurgersController : Controller
     [HttpPost()]
     public IResult CreateBurger([FromBody] CreateOrUpdateBurgerDto dto)
     {
+        var t = 0;
         if (!ModelState.IsValid)
             return Results.BadRequest(ModelState);
 

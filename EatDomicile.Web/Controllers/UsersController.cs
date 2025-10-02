@@ -1,4 +1,6 @@
-﻿using EatDomicile.Web.Services.Interfaces;
+﻿using EatDomicile.Web.Services.Domains.Addresses.DTO;
+using EatDomicile.Web.Services.Domains.Users.DTO;
+using EatDomicile.Web.Services.Interfaces;
 using EatDomicile.Web.ViewModels.Users;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,162 +10,239 @@ public class UsersController : Controller
 {
     private readonly IApiUsersService usersService;
 
-    public UsersController(IApiUsersService userssService)
+    public UsersController(IApiUsersService usersService)
     {
         this.usersService = usersService;
     }
 
-    //GET UserssController
+
+    // GET: UsersController
     public async Task<IActionResult> Index()
     {
-        var userss = await this.usersService.GetUsersAsync();
-        return View(userss.Select(static users => new UsersViewModel()
+        var users = await this.usersService.GetUsersAsync();
+
+        return View(users.Select(static user => new UsersViewModel()
         {
-            Id = users.Id,
-            Name = users.Name,
-            Price = users.Price,
-            Fizzy = users.Fizzy,
-            KCal = users.KCal,
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Phone = user.Phone,
+            Mail = user.Mail
         }));
     }
 
-    //GET UserssController/Details/id
+    // GET: UsersController/Details/5
     public async Task<IActionResult> Details(int id)
     {
-        var users = await this.usersService.GetUsersAsync(id);
-
-        if (users is null)
+        try
         {
-            return this.NotFound();
+            var user = await this.usersService.GetUserAsync(id);
+
+            if (user is null)
+            {
+                return this.NotFound();
+            }
+
+            UserDTO userDto = new UserDTO()
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Phone = user.Phone,
+                Mail = user.Mail,
+                Address = new AddressDTO()
+                {
+                    Id = user.Address.Id,
+                    Street = user.Address.Street,
+                    City = user.Address.City,
+                    State = user.Address.State,
+                    Zip = user.Address.Zip,
+                    Country = user.Address.Country
+                }
+            };
+
+            return this.View(new UsersDetailsViewModel()
+            {
+                User = userDto,
+                Address = userDto.Address
+            });
         }
-
-        return this.View(new UsersDetailsViewModel()
+        catch (Exception e)
         {
-            Id = users.Id,
-            Name = users.Name,
-            Price = users.Price,
-            Fizzy = users.Fizzy,
-            KCal = users.KCal,
-        });
+            TempData["ErrorMessage"] = "L'utilisateur n'existe pas ou a été supprimé!";
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     public IActionResult Create()
     {
-        var usersCreateViewModel = new UsersCreateViewModel();
-        return this.View(usersCreateViewModel);
+        var userCreateViewModel = new UsersCreateViewModel();
+
+        return this.View(userCreateViewModel);
     }
 
-    // POST: UserssController/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Create([Bind("Name,Price,Fizzy,KCal")] UsersCreateViewModel usersCreateViewModel)
+    public async Task<ActionResult> Create([Bind("FirstName,LastName,Mail,Phone,Street,City,State,Zip,Country")] UsersCreateViewModel userCreateViewModel)
     {
         if (!this.ModelState.IsValid)
-            return this.View(usersCreateViewModel);
+            return this.View(userCreateViewModel);
 
         try
         {
-            var newUsers = new UsersDTO
+            var newUser = new UserDTO
             {
-                Name = usersCreateViewModel.Name,
-                Price = usersCreateViewModel.Price,
-                Fizzy = usersCreateViewModel.Fizzy,
-                KCal = usersCreateViewModel.KCal,
+                FirstName = userCreateViewModel.FirstName,
+                LastName = userCreateViewModel.LastName,
+                Phone = userCreateViewModel.Phone,
+                Mail = userCreateViewModel.Mail,
+                Address = new AddressDTO()
+                {
+                    City = userCreateViewModel.City,
+                    Country = userCreateViewModel.Country,
+                    State = userCreateViewModel.State,
+                    Zip = userCreateViewModel.Zip,
+                    Street = userCreateViewModel.Street
+                }
             };
 
-            await this.usersService.CreateUsersAsync(newUsers);
+            await this.usersService.CreateUserAsync(newUser);
             return this.RedirectToAction(nameof(this.Index));
         }
         catch
         {
-            return this.View();
+            TempData["ErrorMessage"] = "Echec de la création de l'utilisateur";
+            return RedirectToAction(nameof(Index));
         }
     }
 
     public async Task<ActionResult> Edit(int id)
     {
-        var users = await this.usersService.GetUsersAsync(id);
-
-        if (users is null)
+        try
         {
-            return this.NotFound();
+            var user = await this.usersService.GetUserAsync(id);
+
+            if (user is null)
+            {
+                return this.NotFound();
+            }
+
+            var userEditViewModel = new UsersEditViewModel
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Phone = user.Phone,
+                Mail = user.Mail,
+                Street = user.Address.Street,
+                City = user.Address.City,
+                State = user.Address.State,
+                Zip = user.Address.Zip,
+                Country = user.Address.Country
+            };
+
+            return this.View(userEditViewModel);
         }
-
-        var usersEditViewModel = new UsersEditViewModel
+        catch (Exception e)
         {
-            Id = users.Id,
-            Name = users.Name,
-            Price = users.Price,
-            Fizzy = users.Fizzy,
-            KCal = users.KCal,
-        };
-
-        return this.View(usersEditViewModel);
+            TempData["ErrorMessage"] = "L'utilisateur n'existe pas ou a été supprimé!";
+            return RedirectToAction(nameof(Index));
+        }
     }
 
-    // POST: UserssController/Edit/5
+    // POST: UsersController/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Edit(int id, [Bind("Id,Name,Price,Fizzy,KCal")] UsersEditViewModel usersEditViewModel)
+    public async Task<ActionResult> Edit(int id, [Bind("Id,FirstName,LastName,Mail,Phone,Street,City,State,Zip,Country")] UsersEditViewModel userEditViewModel)
     {
         if (!this.ModelState.IsValid)
-            return this.View(usersEditViewModel);
+            return this.View(userEditViewModel);
 
         try
         {
-            var editUsers = new UsersDTO
+            var editUser = new UserDTO
             {
-                Id = usersEditViewModel.Id,
-                Name = usersEditViewModel.Name,
-                Price = usersEditViewModel.Price,
-                Fizzy = usersEditViewModel.Fizzy,
-                KCal = usersEditViewModel.KCal,
+                FirstName = userEditViewModel.FirstName,
+                LastName = userEditViewModel.LastName,
+                Phone = userEditViewModel.Phone,
+                Mail = userEditViewModel.Mail,
+                Address = new AddressDTO()
+                {
+                    City = userEditViewModel.City,
+                    Country = userEditViewModel.Country,
+                    State = userEditViewModel.State,
+                    Zip = userEditViewModel.Zip,
+                    Street = userEditViewModel.Street
+                }
             };
 
-            await this.usersService.UpdateUsersAsync(id, editUsers);
+            await this.usersService.UpdateUserAsync(id, editUser);
 
             return this.RedirectToAction(nameof(this.Index));
         }
         catch
         {
-            return this.View();
+            TempData["ErrorMessage"] = "Echec de la modification de l'utilisateur";
+            return RedirectToAction(nameof(Index));
         }
     }
 
     public async Task<ActionResult> Delete(int id)
     {
-        var users = await this.usersService.GetUsersAsync(id);
-
-        if (users is null)
+        try
         {
-            return this.NotFound();
+            var user = await this.usersService.GetUserAsync(id);
+
+            if (user is null)
+            {
+                return this.NotFound();
+            }
+
+            UserDTO userDto = new UserDTO()
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Phone = user.Phone,
+                Mail = user.Mail,
+                Address = new AddressDTO()
+                {
+                    Id = user.Address.Id,
+                    Street = user.Address.Street,
+                    City = user.Address.City,
+                    State = user.Address.State,
+                    Zip = user.Address.Zip,
+                    Country = user.Address.Country
+                }
+            };
+
+            return this.View(new UsersDetailsViewModel()
+            {
+                User = userDto,
+                Address = userDto.Address
+            });
         }
-
-        var usersFound = new UsersViewModel
+        catch (Exception e)
         {
-            Id = users.Id,
-            Name = users.Name,
-            Price = users.Price,
-            Fizzy = users.Fizzy,
-            KCal = users.KCal,
-        };
-
-        return this.View(usersFound);
+            TempData["ErrorMessage"] = "L'utilisateur n'existe pas ou a été supprimé!";
+            return RedirectToAction(nameof(Index));
+        }
     }
 
-    // POST: UserssController/Delete/5
+    // POST: DrinksController/Delete/5
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> DeleteConfirmed(int id)
     {
         try
         {
-            await this.usersService.DeleteUsersAsync(id);
+            await this.usersService.DeleteUserAsync(id);
             return this.RedirectToAction(nameof(this.Index));
         }
         catch
         {
-            return this.View(nameof(this.Details));
+            TempData["ErrorMessage"] = "Echec de la suppréssion de l'utilisateur";
+            return RedirectToAction(nameof(Index));
         }
     }
 }

@@ -1,21 +1,11 @@
-﻿using EatDomicile.Web.Services.Doughs.DTO;
-using System.ComponentModel;
+﻿using EatDomicile.Web.Services.Domains.Ingredients.DTO;
+using EatDomicile.Web.Services.Domains.Pizzas.DTO;
 
 namespace EatDomicile.Web.ViewModels.Pizzas;
 
 public class PizzaDetailsViewModel
 {
-    public int? Id { get; set; }
+    public PizzaDTO Pizza { get; set; }
 
-    [DisplayName("Nom")]
-    public string Name { get; set; }
-
-    [DisplayName("Prix")]
-    public decimal Price { get; set; }
-    [DisplayName("Pâte")]
-
-    public DoughsDTO Doughs { get; set; }
-
-    [DisplayName("Végétarien")]
-    public bool Vegetarian { get; set; }
+    public IEnumerable<IngredientDTO> Ingredients { get; set; }
 }

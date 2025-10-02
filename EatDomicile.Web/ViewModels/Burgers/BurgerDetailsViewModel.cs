@@ -1,5 +1,5 @@
-﻿using EatDomicile.Web.Services.Burgers.DTO;
-using EatDomicile.Web.Services.Ingredient.DTO;
+﻿using EatDomicile.Web.Services.Domains.Burgers.DTO;
+using EatDomicile.Web.Services.Domains.Ingredients.DTO;
 
 namespace EatDomicile.Web.ViewModels.Burgers;
 

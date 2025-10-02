@@ -1,0 +1,71 @@
+﻿@model EatDomicile.Web.ViewModels.Users.UsersEditViewModel
+
+@{
+    ViewData["Title"] = "Modifier utilisateur";
+}
+
+<div class="row">
+    <div class="col-6 d-flex align-items-center justify-content-start mt-3">
+        <h1>Modifier un utilisateur</h1>
+    </div>
+    <div class="col-6 d-flex align-items-center justify-content-end">
+        <a asp-action="Index" class="btn btn-primary">Annuler et retourner sur la liste des utilisateurs</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="FirstName" class="control-label"></label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastName" class="control-label"></label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Mail" class="control-label"></label>
+                <input asp-for="Mail" class="form-control" />
+                <span asp-validation-for="Mail" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Phone" class="control-label"></label>
+                <input asp-for="Phone" class="form-control" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Street" class="control-label"></label>
+                <input asp-for="Street" class="form-control" />
+                <span asp-validation-for="Street" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="City" class="control-label"></label>
+                <input asp-for="City" class="form-control" />
+                <span asp-validation-for="City" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="State" class="control-label"></label>
+                <input asp-for="State" class="form-control" />
+                <span asp-validation-for="State" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Zip" class="control-label"></label>
+                <input asp-for="Zip" class="form-control" />
+                <span asp-validation-for="Zip" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Country" class="control-label"></label>
+                <input asp-for="Country" class="form-control" />
+                <span asp-validation-for="Country" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Modifier" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
