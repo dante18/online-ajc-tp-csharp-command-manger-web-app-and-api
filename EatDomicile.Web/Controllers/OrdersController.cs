@@ -36,7 +36,7 @@ public class OrdersController : Controller
             OrderDate = order.OrderDate,
             DeliveryDate = order.DeliveryDate,
             Status = order.Status,
-            User = new UserDTO()
+            User = new UsersDTO()
             {
                 Id = order.User.Id,
                 FirstName = order.User.FirstName,
@@ -74,7 +74,7 @@ public class OrdersController : Controller
                 OrderDate = order.OrderDate,
                 DeliveryDate = order.DeliveryDate,
                 Status = order.Status,
-                User = new UserDTO()
+                User = new UsersDTO()
                 {
                     Id = order.User.Id,
                     FirstName = order.User.FirstName,
@@ -224,7 +224,7 @@ public class OrdersController : Controller
                 OrderDate = order.OrderDate,
                 DeliveryDate = order.DeliveryDate,
                 Status = order.Status,
-                User = new UserDTO()
+                User = new UsersDTO()
                 {
                     Id = order.User.Id,
                     FirstName = order.User.FirstName,
