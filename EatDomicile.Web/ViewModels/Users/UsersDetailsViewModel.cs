@@ -6,7 +6,7 @@ namespace EatDomicile.Web.ViewModels.Users
 {
     public class UsersDetailsViewModel
     {
-        public UserDTO User { get; set; }
+        public UsersDTO User { get; set; }
 
         public IEnumerable<AddressDTO> Addresses { get; set; }
     }

@@ -11,11 +11,11 @@ namespace EatDomicile.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UsersControllers : ControllerBase
     {
         private readonly UserService userService;
 
-        public UserController(UserService userService)
+        public UsersControllers(UserService userService)
         {
             this.userService = userService;
         }

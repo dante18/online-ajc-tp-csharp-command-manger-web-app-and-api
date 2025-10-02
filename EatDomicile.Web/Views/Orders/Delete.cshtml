@@ -1,0 +1,61 @@
+﻿@model EatDomicile.Web.ViewModels.Orders.OrderDetailsViewModel
+
+@{
+    ViewData["Title"] = "Supprimer commande";
+}
+
+<div class="row">
+    <div class="col-6 d-flex align-items-center justify-content-start mt-3">
+        <h1>Supprimer une commande</h1>
+    </div>
+    <div class="col-6 d-flex align-items-center justify-content-end">
+        <a asp-action="Index" class="btn btn-primary">Annuler et retourner sur la liste des commandes</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-start">
+        <h3>Êtes-vous sûr de vouloir supprimer cette commande ?</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-start">
+        <dl class="row">
+            <dt class="col-sm-4">
+                Date de la commande :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Order.OrderDate)
+            </dd>
+            <dt class="col-sm-4">
+                Date de livraison :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Order.DeliveryDate == null ? "Inconnu" : Model.Order.DeliveryDate)
+            </dd>
+            <dt class="col-sm-4">
+                Status de la commande
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Order.Status == 1 ? "En cours" : "Livrée")
+            </dd>
+            <dt class="col-sm-4">
+                Propriétaire de la commande
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Order.User.FirstName.ToUpper()) @(Model.Order.User.LastName)
+            </dd>
+        </dl>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-start">
+        <div>
+            <form asp-action="DeleteConfirmed" method="post">
+                <input type="hidden" name="id" value="@Model.Order.Id" />
+                <div class="form-group">
+                    <input type="submit" value="Supprimer" class="btn btn-danger" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

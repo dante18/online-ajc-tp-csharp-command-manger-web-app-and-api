@@ -1,0 +1,88 @@
+﻿@model EatDomicile.Web.ViewModels.Users.UsersDetailsViewModel
+
+@{
+    ViewData["Title"] = "Détail user";
+}
+
+<div class="row">
+    <div class="col-6 d-flex align-items-center justify-content-start mt-3">
+        <h1>Détail d'un user</h1>
+    </div>
+    <div class="col-6 d-flex align-items-center justify-content-end">
+        <a asp-action="Index" class="btn btn-primary">Retourner sur la liste des users</a>
+        <a asp-action="Edit" asp-route-id="@(Model.User.Id) " class="btn btn-warning ms-2">Modifier le user</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-start">
+        <dl class="row">
+            <dt class="col-sm-4">
+                Nom :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.User.FirstName) @(Model.User.LastName)
+            </dd>
+            <dt class="col-sm-4">
+                Mail :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.User.Mail)
+            </dd>
+            <dt class="col-sm-4">
+                Numéro de téléphone
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.User.Phone)
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-6 d-flex align-items-center justify-content-start mt-3">
+        <h1>Liste des addresss</h1>
+    </div>
+    <div class="col-6 d-flex align-items-center justify-content-end">
+        <a asp-action="AddAddress" asp-route-id="@(Model.User.Id) " class="btn btn-warning ms-2">Ajouter une adresse</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 table-responsive mt-3">
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th class="text-center">Rue</th>
+                <th class="text-center">Ville</th>
+                <th class="text-center">Région</th>
+                <th class="text-center">Code Postal</th>
+                <th class="text-center">Pays</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var address in Model.Addresses)
+            {
+                <tr>
+                    <td class="text-center">@address.Street</td>
+                    <td class="text-center">@(address.City)</td>
+                    <td class="text-center">@address.State</td>
+                    <td class="text-center">@address.Zip</td>
+                    <td class="text-center">@address.Country</td>
+                    <td class="text-center">
+                        <a asp-action="EditAddress" 
+                            asp-route-id="@address.Id" 
+                            asp-route-userId="@this.Model.User.Id"
+                            class="btn btn-warning"
+                        >
+                            Modifier
+                        </a>
+                        <a asp-action="DeleteAddress" asp-route-id="@address.Id" 
+                            asp-route-userId="@this.Model.User.Id" class="btn btn-danger">
+                            Supprimer
+                        </a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
