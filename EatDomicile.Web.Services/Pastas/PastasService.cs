@@ -1,9 +1,10 @@
 ﻿using EatDomicile.Web.Services.Pastas.DTO;
 using System.Net.Http.Json;
+using EatDomicile.Web.Services.Interfaces;
 
 namespace EatDomicile.Web.Services.Pastas;
 
-public class PastasService
+public class PastasService : IApiPastasService
 {
     private readonly HttpClient httpClient;
 

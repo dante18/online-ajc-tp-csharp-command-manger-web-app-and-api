@@ -1,8 +1,6 @@
 ﻿using EatDomicile.Web.Services.Addresses.DTO;
-using EatDomicile.Web.Services.Orders;
+using EatDomicile.Web.Services.Interfaces;
 using EatDomicile.Web.Services.Orders.DTO;
-using EatDomicile.Web.Services.Products;
-using EatDomicile.Web.Services.Users;
 using EatDomicile.Web.Services.Users.DTO;
 using EatDomicile.Web.ViewModels.Orders;
 using Microsoft.AspNetCore.Mvc;
@@ -12,13 +10,13 @@ namespace EatDomicile.Web.Controllers;
 
 public class OrdersController : Controller
 {
-    private readonly OrdersService orderService;
+    private readonly IApiOrdersService orderService;
 
-    private readonly ProductsService productService;
+    private readonly IApiProductsService productService;
 
-    private readonly UsersService usersService;
+    private readonly IApiUsersService usersService;
 
-    public OrdersController(OrdersService orderService, ProductsService productService, UsersService usersService)
+    public OrdersController(IApiOrdersService orderService, IApiProductsService productService, IApiUsersService usersService)
     {
         this.orderService = orderService;
         this.productService = productService;

@@ -1,22 +1,19 @@
-﻿using EatDomicile.Core.Entities;
-using EatDomicile.Web.Services.Burgers;
-using EatDomicile.Web.Services.Burgers.DTO;
+﻿using EatDomicile.Web.Services.Burgers.DTO;
 using EatDomicile.Web.Services.Ingredient.DTO;
-using EatDomicile.Web.Services.Ingredients;
+using EatDomicile.Web.Services.Interfaces;
 using EatDomicile.Web.ViewModels.Burgers;
 using EatDomicile.Web.ViewModels.Ingredients;
-using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EatDomicile.Web.Controllers;
 
 public class BurgersController : Controller
 {
-    private readonly BurgersService burgerService;
+    private readonly IApiBurgersService burgerService;
 
-    private readonly IngredientsService ingredientService;
+    private readonly IApiIngredientsService ingredientService;
 
-    public BurgersController(BurgersService burgerService, IngredientsService ingredientService)
+    public BurgersController(IApiBurgersService burgerService, IApiIngredientsService ingredientService)
     {
         this.burgerService = burgerService;
         this.ingredientService = ingredientService;

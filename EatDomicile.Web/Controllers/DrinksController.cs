@@ -1,7 +1,4 @@
-﻿
-using EatDomicile.Core.Entities;
-using EatDomicile.Web.Services.Drinks;
-using EatDomicile.Web.Services.Drinks.DTO;
+﻿using EatDomicile.Web.Services.Drinks.DTO;
 using EatDomicile.Web.Services.Interfaces;
 using EatDomicile.Web.ViewModels.Drinks;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +7,9 @@ namespace EatDomicile.Web.Controllers;
 
 public class DrinksController : Controller
 {
-    private readonly DrinksService drinksService;
+    private readonly IApiDrinksService drinksService;
 
-    public DrinksController(DrinksService drinksService)
+    public DrinksController(IApiDrinksService drinksService)
     {
         this.drinksService = drinksService;
     }

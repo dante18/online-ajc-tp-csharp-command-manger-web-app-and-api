@@ -1,8 +1,5 @@
-﻿using EatDomicile.Core.Entities;
-using EatDomicile.Web.Services.Doughs;
-using EatDomicile.Web.Services.Pizzas;
+﻿using EatDomicile.Web.Services.Interfaces;
 using EatDomicile.Web.Services.Pizzas.DTO;
-using EatDomicile.Web.ViewModels.Doughs;
 using EatDomicile.Web.ViewModels.Pizzas;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -11,10 +8,11 @@ namespace EatDomicile.Web.Controllers;
 
 public class PizzasController : Controller
 {
-    private readonly PizzasService pizzasService;
-    private readonly DoughsService doughService;
+    private readonly IApiPizzasService pizzasService;
 
-    public PizzasController(PizzasService pizzasService, DoughsService doughService)
+    private readonly IApiDoughsService doughService;
+
+    public PizzasController(IApiPizzasService pizzasService, IApiDoughsService doughService)
     {
         this.pizzasService = pizzasService;
         this.doughService = doughService;

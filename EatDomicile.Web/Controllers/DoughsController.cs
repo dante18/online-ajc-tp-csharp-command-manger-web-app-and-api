@@ -1,5 +1,5 @@
-﻿using EatDomicile.Web.Services.Doughs;
-using EatDomicile.Web.Services.Doughs.DTO;
+﻿using EatDomicile.Web.Services.Doughs.DTO;
+using EatDomicile.Web.Services.Interfaces;
 using EatDomicile.Web.ViewModels.Doughs;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,9 +7,9 @@ namespace EatDomicile.Web.Controllers;
 
 public class DoughsController : Controller
 {
-    private readonly DoughsService doughsService;
+    private readonly IApiDoughsService doughsService;
 
-    public DoughsController(DoughsService doughsService)
+    public DoughsController(IApiDoughsService doughsService)
     {
         this.doughsService = doughsService;
     }

@@ -1,11 +1,10 @@
 ﻿using EatDomicile.Web.Services.Drinks.DTO;
 using EatDomicile.Web.Services.Interfaces;
 using System.Net.Http.Json;
-using System.Text;
-using System.Text.Json;
 
 namespace EatDomicile.Web.Services.Drinks;
-public class DrinksService
+
+public class DrinksService : IApiDrinksService
 {
     private readonly HttpClient httpClient;
 
@@ -13,6 +12,7 @@ public class DrinksService
     {
         this.httpClient = httpClient;
     }
+
     public async Task<IEnumerable<DrinkDTO>> GetDrinksAsync()
     {
         var drinks = await httpClient.GetFromJsonAsync<IEnumerable<DrinkDTO>>("https://localhost:7001/api/drinks");

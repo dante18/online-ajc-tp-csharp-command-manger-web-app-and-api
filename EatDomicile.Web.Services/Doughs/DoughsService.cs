@@ -1,9 +1,10 @@
 ﻿using System.Net.Http.Json;
 using EatDomicile.Web.Services.Doughs.DTO;
+using EatDomicile.Web.Services.Interfaces;
 
 namespace EatDomicile.Web.Services.Doughs;
 
-public class DoughsService
+public class DoughsService : IApiDoughsService
 {
     private readonly HttpClient httpClient;
 

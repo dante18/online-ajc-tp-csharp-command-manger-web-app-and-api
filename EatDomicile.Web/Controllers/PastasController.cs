@@ -1,18 +1,15 @@
-﻿using EatDomicile.Core.Entities;
-using EatDomicile.Web.Services.Pastas;
+﻿using EatDomicile.Web.Services.Interfaces;
 using EatDomicile.Web.Services.Pastas.DTO;
 using EatDomicile.Web.ViewModels.Pastas;
-using EatDomicile.Web.ViewModels.Pastas;
 using Microsoft.AspNetCore.Mvc;
-using System.IO;
 
 namespace EatDomicile.Web.Controllers;
 
 public class PastasController : Controller
 {
-    private readonly PastasService pastasService;
+    private readonly IApiPastasService pastasService;
 
-    public PastasController(PastasService pastasService)
+    public PastasController(IApiPastasService pastasService)
     {
         this.pastasService = pastasService;
     }

@@ -1,10 +1,11 @@
-﻿using System.Net.Http.Json;
-using EatDomicile.Web.Services.Burgers.DTO;
+﻿using EatDomicile.Web.Services.Burgers.DTO;
 using EatDomicile.Web.Services.Ingredient.DTO;
+using EatDomicile.Web.Services.Interfaces;
+using System.Net.Http.Json;
 
 namespace EatDomicile.Web.Services.Burgers;
 
-public class BurgersService
+public class BurgersService : IApiBurgersService
 {
     private readonly HttpClient httpClient;
 

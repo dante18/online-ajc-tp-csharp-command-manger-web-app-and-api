@@ -1,9 +1,10 @@
 ﻿using System.Net.Http.Json;
+using EatDomicile.Web.Services.Interfaces;
 using EatDomicile.Web.Services.Orders.DTO;
 
 namespace EatDomicile.Web.Services.Orders;
 
-public class OrdersService
+public class OrdersService : IApiOrdersService
 {
     private readonly HttpClient httpClient;
 

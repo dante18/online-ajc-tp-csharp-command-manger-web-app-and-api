@@ -1,8 +1,9 @@
 ﻿using EatDomicile.Web.Services.Ingredient.DTO;
 using System.Net.Http.Json;
+using EatDomicile.Web.Services.Interfaces;
 
 namespace EatDomicile.Web.Services.Ingredients;
-public class IngredientsService
+public class IngredientsService : IApiIngredientsService
 {
     private readonly HttpClient httpClient;
 

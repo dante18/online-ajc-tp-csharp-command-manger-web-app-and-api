@@ -1,9 +1,10 @@
 ﻿using EatDomicile.Web.Services.Pizzas.DTO;
 using System.Net.Http.Json;
+using EatDomicile.Web.Services.Interfaces;
 
 namespace EatDomicile.Web.Services.Pizzas;
 
-public class PizzasService
+public class PizzasService : IApiPizzasService
 {
     private readonly HttpClient httpClient;
 
