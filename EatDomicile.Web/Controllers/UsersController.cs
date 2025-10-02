@@ -1,171 +1,301 @@
 ﻿using EatDomicile.Web.Services.Users;
-using EatDomicile.Web.Services.Users;
+using EatDomicile.Web.Services.Users.DTO;
 using EatDomicile.Web.ViewModels.Users;
 using Microsoft.AspNetCore.Mvc;
 
-namespace EatDomicile.Web.Controllers
+namespace EatDomicile.Web.Controllers;
+
+public class UsersController : Controller
 {
-    public class UsersController : Controller
+    private readonly UsersService usersService;
+
+    public UsersController(UsersService usersService)
     {
-        private readonly UsersService usersService;
+        this.usersService = usersService;
+    }
 
-        public UsersController(UsersService userssService)
+
+    // GET: UsersController
+    public async Task<IActionResult> Index()
+    {
+        var users = await this.usersService.GetUsersAsync();
+        return View(users.Select(static user => new UsersViewModel()
         {
-            this.usersService = usersService;
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Phone = user.Phone,
+            Mail = user.Mail
+        }));
+    }
+
+    // GET: UsersController/Details/5
+    public async Task<IActionResult> Details(int id)
+    {
+        var user = await this.usersService.GetUserAsync(id);
+
+        if (user is null)
+        {
+            return this.NotFound();
         }
 
-        //GET UserssController
-        public async Task<IActionResult> Index()
+        UserDTO userDto = new UserDTO()
         {
-            var userss = await this.usersService.GetUsersAsync();
-            return View(userss.Select(static users => new UsersViewModel()
-            {
-                Id = users.Id,
-                Name = users.Name,
-                Price = users.Price,
-                Fizzy = users.Fizzy,
-                KCal = users.KCal,
-            }));
-        }
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Phone = user.Phone,
+            Mail = user.Mail
+        };
 
-        //GET UserssController/Details/id
-        public async Task<IActionResult> Details(int id)
+        var ingredients = await this.usersService.GetUserAddress(id);
+
+        return this.View(new UsersDetailsViewModel()
         {
-            var users = await this.usersService.GetUsersAsync(id);
+            User = userDto,
+            Ingredients = ingredients
+        });
+    }
 
-            if (users is null)
-            {
-                return this.NotFound();
-            }
 
-            return this.View(new UsersDetailsViewModel()
-            {
-                Id = users.Id,
-                Name = users.Name,
-                Price = users.Price,
-                Fizzy = users.Fizzy,
-                KCal = users.KCal,
-            });
-        }
+    public IActionResult Create()
+    {
+        var userCreateViewModel = new UsersCreateViewModel();
+        return this.View(userCreateViewModel);
+    }
 
-        public IActionResult Create()
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> Create([Bind("Name,Price,Vegetarian")] UserCreateViewModel userCreateViewModel)
+    {
+        if (!this.ModelState.IsValid)
+            return this.View(userCreateViewModel);
+
+        try
         {
-            var usersCreateViewModel = new UsersCreateViewModel();
-            return this.View(usersCreateViewModel);
-        }
-
-        // POST: UserssController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind("Name,Price,Fizzy,KCal")] UsersCreateViewModel usersCreateViewModel)
-        {
-            if (!this.ModelState.IsValid)
-                return this.View(usersCreateViewModel);
-
-            try
+            var newUser = new UserDTO
             {
-                var newUsers = new UsersDTO
-                {
-                    Name = usersCreateViewModel.Name,
-                    Price = usersCreateViewModel.Price,
-                    Fizzy = usersCreateViewModel.Fizzy,
-                    KCal = usersCreateViewModel.KCal,
-                };
-
-                await this.usersService.CreateUsersAsync(newUsers);
-                return this.RedirectToAction(nameof(this.Index));
-            }
-            catch
-            {
-                return this.View();
-            }
-        }
-
-        public async Task<ActionResult> Edit(int id)
-        {
-            var users = await this.usersService.GetUsersAsync(id);
-
-            if (users is null)
-            {
-                return this.NotFound();
-            }
-
-            var usersEditViewModel = new UsersEditViewModel
-            {
-                Id = users.Id,
-                Name = users.Name,
-                Price = users.Price,
-                Fizzy = users.Fizzy,
-                KCal = users.KCal,
+                Name = userCreateViewModel.Name,
+                Price = userCreateViewModel.Price,
+                Vegetarian = userCreateViewModel.Vegetarian
             };
 
-            return this.View(usersEditViewModel);
+            await this.userService.CreateUserAsync(newUser);
+            return this.RedirectToAction(nameof(this.Index));
+        }
+        catch
+        {
+            return this.View();
+        }
+    }
+
+
+    public async Task<ActionResult> Edit(int id)
+    {
+        var user = await this.userService.GetUserAsync(id);
+
+        if (user is null)
+        {
+            return this.NotFound();
         }
 
-        // POST: UserssController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(int id, [Bind("Id,Name,Price,Fizzy,KCal")] UsersEditViewModel usersEditViewModel)
+        var userEditViewModel = new UserEditViewModel
         {
-            if (!this.ModelState.IsValid)
-                return this.View(usersEditViewModel);
+            Id = user.Id,
+            Name = user.Name,
+            Price = user.Price,
+            Vegetarian = user.Vegetarian,
+        };
 
-            try
-            {
-                var editUsers = new UsersDTO
-                {
-                    Id = usersEditViewModel.Id,
-                    Name = usersEditViewModel.Name,
-                    Price = usersEditViewModel.Price,
-                    Fizzy = usersEditViewModel.Fizzy,
-                    KCal = usersEditViewModel.KCal,
-                };
+        return this.View(userEditViewModel);
+    }
 
-                await this.usersService.UpdateUsersAsync(id, editUsers);
+    // POST: UsersController/Edit/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> Edit(int id, [Bind("Id,Name,Price,Vegetarian")] UserEditViewModel userEditViewModel)
+    {
+        if (!this.ModelState.IsValid)
+            return this.View(userEditViewModel);
 
-                return this.RedirectToAction(nameof(this.Index));
-            }
-            catch
-            {
-                return this.View();
-            }
-        }
-
-        public async Task<ActionResult> Delete(int id)
+        try
         {
-            var users = await this.usersService.GetUsersAsync(id);
-
-            if (users is null)
+            var editUser = new UserDTO
             {
-                return this.NotFound();
-            }
-
-            var usersFound = new UsersViewModel
-            {
-                Id = users.Id,
-                Name = users.Name,
-                Price = users.Price,
-                Fizzy = users.Fizzy,
-                KCal = users.KCal,
+                Id = userEditViewModel.Id,
+                Name = userEditViewModel.Name,
+                Price = userEditViewModel.Price,
+                Vegetarian = userEditViewModel.Vegetarian
             };
 
-            return this.View(usersFound);
+            await this.userService.UpdateUserAsync(id, editUser);
+
+            return this.RedirectToAction(nameof(this.Index));
+        }
+        catch
+        {
+            return this.View();
+        }
+    }
+
+    public async Task<ActionResult> Delete(int id)
+    {
+        var user = await this.userService.GetUserAsync(id);
+
+        if (user is null)
+        {
+            return this.NotFound();
         }
 
-        // POST: UserssController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> DeleteConfirmed(int id)
+        var userFound = new UserViewModel
         {
-            try
+            Id = user.Id,
+            Name = user.Name,
+            Price = user.Price,
+            Vegetarian = user.Vegetarian
+        };
+
+        return this.View(userFound);
+    }
+
+    // POST: DrinksController/Delete/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> DeleteConfirmed(int id)
+    {
+        try
+        {
+            await this.userService.DeleteUserAsync(id);
+            return this.RedirectToAction(nameof(this.Index));
+        }
+        catch
+        {
+            return this.View(nameof(this.Details));
+        }
+    }
+
+
+    [HttpGet("Users/{id}/Ingredients/Add")]
+    public async Task<IActionResult> AddIngredient(int id)
+    {
+        var user = await this.userService.GetUserAsync(id);
+
+        this.ViewData["userSelected"] = user.Name;
+        this.ViewData["userSelectedId"] = user.Id;
+
+        return this.View(new IngredientCreateViewModel());
+    }
+
+    // POST: UsersController/Edit/5
+    [HttpPost("Users/{id}/Ingredients/Add")]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> AddIngredient(int id, [Bind("Name,KCal,IsAllergen")] IngredientCreateViewModel ingredientCreateViewModel)
+    {
+        if (!this.ModelState.IsValid)
+            return this.View(ingredientCreateViewModel);
+
+        try
+        {
+            var newIngredient = new IngredientDTO
             {
-                await this.usersService.DeleteUsersAsync(id);
-                return this.RedirectToAction(nameof(this.Index));
-            }
-            catch
+                Name = ingredientCreateViewModel.Name,
+                KCal = ingredientCreateViewModel.KCal,
+                IsAllergen = ingredientCreateViewModel.IsAllergen
+            };
+
+            await this.userService.UpdateUserAddIngredientAsync(id, newIngredient);
+
+            return this.RedirectToAction(nameof(this.Details), new { id = id });
+        }
+        catch
+        {
+            return this.View();
+        }
+    }
+
+    [HttpGet("Users/{userId}/Ingredients/{id}/Edit")]
+    public async Task<IActionResult> EditIngredient(int userId, int id)
+    {
+        var user = await this.userService.GetUserAsync(userId);
+
+        this.ViewData["userSelected"] = user.Name;
+        this.ViewData["userSelectedId"] = user.Id;
+        var ingredient = await this.ingredientService.GetIngredientAsync(id);
+
+        var ingredientEditViewModel = new IngredientEditViewModel
+        {
+            Id = ingredient.Id,
+            Name = ingredient.Name,
+            KCal = ingredient.KCal,
+            IsAllergen = ingredient.IsAllergen,
+        };
+
+        return this.View(ingredientEditViewModel);
+    }
+
+    // POST: UsersController/Edit/5
+    [HttpPost("Users/{userId}/Ingredients/{id}/Edit")]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> EditIngredient(int userId, int id, [Bind("Id,Name,KCal,IsAllergen")] IngredientEditViewModel ingredientEditViewModel)
+    {
+        if (!this.ModelState.IsValid)
+            return this.View(ingredientEditViewModel);
+
+        try
+        {
+            var editIngredient = new IngredientDTO
             {
-                return this.View(nameof(this.Details));
-            }
+                Id = ingredientEditViewModel.Id,
+                Name = ingredientEditViewModel.Name,
+                KCal = ingredientEditViewModel.KCal,
+                IsAllergen = ingredientEditViewModel.IsAllergen
+            };
+
+            await this.userService.UpdateUserUpdateIngredientAsync(userId, id, editIngredient);
+
+            return this.RedirectToAction(nameof(this.Details), new { id = userId });
+        }
+        catch
+        {
+            return this.View();
+        }
+    }
+
+    [HttpGet("Users/{userId}/Ingredients/{id}/Delete")]
+    public async Task<ActionResult> DeleteIngredient(int userId, int id)
+    {
+        var user = await this.userService.GetUserAsync(userId);
+
+        this.ViewData["userSelected"] = user.Name;
+        this.ViewData["userSelectedId"] = user.Id;
+        var ingredient = await this.ingredientService.GetIngredientAsync(id);
+
+        var ingredientEditViewModel = new UserIngredientViewModel
+        {
+            Id = ingredient.Id,
+            Name = ingredient.Name,
+            KCal = ingredient.KCal,
+            IsAllergen = ingredient.IsAllergen,
+            UserId = userId
+        };
+
+        return this.View(ingredientEditViewModel);
+    }
+
+    // POST: DrinksController/Delete/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> DeleteIngredientConfirmed(int userId, int id)
+    {
+        try
+        {
+            await this.userService.UpdateUserDeleteIngredientAsync(userId, id);
+            return this.RedirectToAction(nameof(this.Details), new { id = userId });
+        }
+        catch
+        {
+            return this.RedirectToAction(nameof(this.Details), new { id = userId });
         }
     }
 }

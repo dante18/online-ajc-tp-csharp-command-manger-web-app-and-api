@@ -25,7 +25,5 @@ namespace EatDomicile.Web.Services.Users.DTO
         [DisplayName("Mail")]
         public string Mail { get; set; }
 
-        [DisplayName("Adresse")]
-        public AddressDTO Address { get; set; }
     }
 }

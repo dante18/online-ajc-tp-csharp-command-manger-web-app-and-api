@@ -1,4 +1,5 @@
-﻿using EatDomicile.Web.Services.Users.DTO;
+﻿using EatDomicile.Web.Services.Addresses.DTO;
+using EatDomicile.Web.Services.Users.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +28,12 @@ namespace EatDomicile.Web.Services.Users
         {
             var user = await httpClient.GetFromJsonAsync<UserDTO>($"https://localhost:7001/api/users/{id}");
             return user;
+        }
+
+        public async Task<IEnumerable<AddressDTO>> GetUserAddress(int id)
+        {
+            var addresses = await httpClient.GetFromJsonAsync<IEnumerable<AddressDTO>>($"https://localhost:7001/api/burgers/{id}/address");
+            return addresses;
         }
 
         public async Task CreateUserAsync(UserDTO userDTO)
