@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using EatDomicile.Web.Services.Addresses.DTO;
+using System.ComponentModel;
 
 namespace EatDomicile.Web.ViewModels.Users
 {
@@ -17,5 +18,7 @@ namespace EatDomicile.Web.ViewModels.Users
 
         [DisplayName("Mail")]
         public string Mail { get; set; }
+        [DisplayName("Adresse")]
+        public AddressDTO Address { get; set; }
     }
 }

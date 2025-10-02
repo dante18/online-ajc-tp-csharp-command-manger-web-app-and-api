@@ -8,6 +8,6 @@ namespace EatDomicile.Web.ViewModels.Users
     {
         public UsersDTO User { get; set; }
 
-        public IEnumerable<AddressDTO> Addresses { get; set; }
+        public AddressDTO Address { get; set; }
     }
 }

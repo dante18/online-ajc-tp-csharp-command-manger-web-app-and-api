@@ -12,7 +12,6 @@ namespace EatDomicile.Web.Controllers;
 public class UsersController : Controller
 {
     private readonly UsersService usersService;
-    private readonly AddressService addressService;
 
     public UsersController(UsersService usersService)
     {
@@ -29,7 +28,8 @@ public class UsersController : Controller
             FirstName = user.FirstName,
             LastName = user.LastName,
             Phone = user.Phone,
-            Mail = user.Mail
+            Mail = user.Mail,
+            Address = user.Address,
         }));
     }
 
@@ -49,15 +49,12 @@ public class UsersController : Controller
             FirstName = user.FirstName,
             LastName = user.LastName,
             Phone = user.Phone,
-            Mail = user.Mail
+            Mail = user.Mail,
+            Address = user.Address
         };
-
-        var addresses = await this.usersService.GetUserAddress(id);
-
         return this.View(new UsersDetailsViewModel()
         {
             User = userDto,
-            Addresses = addresses
         });
     }
 
