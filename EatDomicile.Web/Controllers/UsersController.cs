@@ -1,5 +1,9 @@
-﻿using EatDomicile.Web.Services.Users;
+﻿using EatDomicile.Core.Entities;
+using EatDomicile.Web.Services.Addresses;
+using EatDomicile.Web.Services.Addresses.DTO;
+using EatDomicile.Web.Services.Users;
 using EatDomicile.Web.Services.Users.DTO;
+using EatDomicile.Web.ViewModels.Addresses;
 using EatDomicile.Web.ViewModels.Users;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,11 +25,11 @@ public class UsersController : Controller
         var users = await this.usersService.GetUsersAsync();
         return View(users.Select(static user => new UsersViewModel()
         {
-            Id = user.Id,
             FirstName = user.FirstName,
             LastName = user.LastName,
             Phone = user.Phone,
-            Mail = user.Mail
+            Mail = user.Mail,
+            Address = user.Address,
         }));
     }
 
@@ -45,15 +49,12 @@ public class UsersController : Controller
             FirstName = user.FirstName,
             LastName = user.LastName,
             Phone = user.Phone,
-            Mail = user.Mail
+            Mail = user.Mail,
+            Address = user.Address
         };
-
-        var ingredients = await this.usersService.GetUserAddress(id);
-
         return this.View(new UsersDetailsViewModel()
         {
             User = userDto,
-            Ingredients = ingredients
         });
     }
 
@@ -67,7 +68,7 @@ public class UsersController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Create([Bind("Name,Price,Vegetarian")] UserCreateViewModel userCreateViewModel)
+    public async Task<ActionResult> Create([Bind("FirstName,LastName,Mail,Phone")] UsersCreateViewModel userCreateViewModel)
     {
         if (!this.ModelState.IsValid)
             return this.View(userCreateViewModel);
@@ -76,9 +77,10 @@ public class UsersController : Controller
         {
             var newUser = new UsersDTO
             {
-                Name = userCreateViewModel.Name,
-                Price = userCreateViewModel.Price,
-                Vegetarian = userCreateViewModel.Vegetarian
+                FirstName = userCreateViewModel.FirstName,
+                LastName = userCreateViewModel.LastName,
+                Phone = userCreateViewModel.Phone,
+                Mail = userCreateViewModel.Mail
             };
 
             await this.usersService.CreateUserAsync(newUser);
@@ -93,19 +95,19 @@ public class UsersController : Controller
 
     public async Task<ActionResult> Edit(int id)
     {
-        var user = await this.userService.GetUserAsync(id);
+        var user = await this.usersService.GetUserAsync(id);
 
         if (user is null)
         {
             return this.NotFound();
         }
 
-        var userEditViewModel = new UserEditViewModel
+        var userEditViewModel = new UsersEditViewModel
         {
-            Id = user.Id,
-            Name = user.Name,
-            Price = user.Price,
-            Vegetarian = user.Vegetarian,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Phone = user.Phone,
+            Mail = user.Mail
         };
 
         return this.View(userEditViewModel);
@@ -114,7 +116,7 @@ public class UsersController : Controller
     // POST: UsersController/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Edit(int id, [Bind("Id,Name,Price,Vegetarian")] UserEditViewModel userEditViewModel)
+    public async Task<ActionResult> Edit(int id, [Bind("FirstName,LastName,Mail,Phone")] UsersEditViewModel userEditViewModel)
     {
         if (!this.ModelState.IsValid)
             return this.View(userEditViewModel);
@@ -123,13 +125,13 @@ public class UsersController : Controller
         {
             var editUser = new UsersDTO
             {
-                Id = userEditViewModel.Id,
-                Name = userEditViewModel.Name,
-                Price = userEditViewModel.Price,
-                Vegetarian = userEditViewModel.Vegetarian
+                FirstName = userEditViewModel.FirstName,
+                LastName = userEditViewModel.LastName,
+                Phone = userEditViewModel.Phone,
+                Mail = userEditViewModel.Mail
             };
 
-            await this.userService.UpdateUserAsync(id, editUser);
+            await this.usersService.UpdateUserAsync(id, editUser);
 
             return this.RedirectToAction(nameof(this.Index));
         }
@@ -141,19 +143,19 @@ public class UsersController : Controller
 
     public async Task<ActionResult> Delete(int id)
     {
-        var user = await this.userService.GetUserAsync(id);
+        var user = await this.usersService.GetUserAsync(id);
 
         if (user is null)
         {
             return this.NotFound();
         }
 
-        var userFound = new UserViewModel
+        var userFound = new UsersViewModel
         {
-            Id = user.Id,
-            Name = user.Name,
-            Price = user.Price,
-            Vegetarian = user.Vegetarian
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Phone = user.Phone,
+            Mail = user.Mail
         };
 
         return this.View(userFound);
@@ -166,7 +168,7 @@ public class UsersController : Controller
     {
         try
         {
-            await this.userService.DeleteUserAsync(id);
+            await this.usersService.DeleteUserAsync(id);
             return this.RedirectToAction(nameof(this.Index));
         }
         catch
@@ -176,35 +178,37 @@ public class UsersController : Controller
     }
 
 
-    [HttpGet("Users/{id}/Ingredients/Add")]
-    public async Task<IActionResult> AddIngredient(int id)
+    [HttpGet("Users/{id}/Addresses/Add")]
+    public async Task<IActionResult> AddAddress(int id)
     {
-        var user = await this.userService.GetUserAsync(id);
+        var user = await this.usersService.GetUserAsync(id);
 
-        this.ViewData["userSelected"] = user.Name;
+        this.ViewData["userSelected"] = $"{user.FirstName} {user.LastName}";
         this.ViewData["userSelectedId"] = user.Id;
 
-        return this.View(new IngredientCreateViewModel());
+        return this.View(new AddressCreateViewModel());
     }
 
     // POST: UsersController/Edit/5
-    [HttpPost("Users/{id}/Ingredients/Add")]
+    [HttpPost("Users/{id}/Addresss/Add")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> AddIngredient(int id, [Bind("Name,KCal,IsAllergen")] IngredientCreateViewModel ingredientCreateViewModel)
+    public async Task<ActionResult> AddAddress(int id, [Bind("Street, City, State, Zip, Country")] AddressCreateViewModel addressCreateViewModel)
     {
         if (!this.ModelState.IsValid)
-            return this.View(ingredientCreateViewModel);
+            return this.View(addressCreateViewModel);
 
         try
         {
-            var newIngredient = new IngredientDTO
+            var newAddress = new AddressDTO
             {
-                Name = ingredientCreateViewModel.Name,
-                KCal = ingredientCreateViewModel.KCal,
-                IsAllergen = ingredientCreateViewModel.IsAllergen
+                Street = addressCreateViewModel.Street,
+                City = addressCreateViewModel.City,
+                State = addressCreateViewModel.State,
+                Zip = addressCreateViewModel.Zip,
+                Country = addressCreateViewModel.Country,
             };
 
-            await this.userService.UpdateUserAddIngredientAsync(id, newIngredient);
+            await this.usersService.UpdateUserAddAddressAsync(id, newAddress);
 
             return this.RedirectToAction(nameof(this.Details), new { id = id });
         }
@@ -214,45 +218,47 @@ public class UsersController : Controller
         }
     }
 
-    [HttpGet("Users/{userId}/Ingredients/{id}/Edit")]
-    public async Task<IActionResult> EditIngredient(int userId, int id)
+    [HttpGet("Users/{userId}/Addresss/{id}/Edit")]
+    public async Task<IActionResult> EditAddress(int userId, int id)
     {
-        var user = await this.userService.GetUserAsync(userId);
+        var user = await this.usersService.GetUserAsync(userId);
 
-        this.ViewData["userSelected"] = user.Name;
+        this.ViewData["userSelected"] = $"{user.FirstName} {user.LastName}";
         this.ViewData["userSelectedId"] = user.Id;
-        var ingredient = await this.ingredientService.GetIngredientAsync(id);
+        var address = await this.addressService.GetAddressAsync(id);
 
-        var ingredientEditViewModel = new IngredientEditViewModel
+        var addressEditViewModel = new AddressEditViewModel
         {
-            Id = ingredient.Id,
-            Name = ingredient.Name,
-            KCal = ingredient.KCal,
-            IsAllergen = ingredient.IsAllergen,
+            Street = address.Street,
+            City = address.City,
+            State = address.State,
+            Zip = address.Zip,
+            Country = address.Country,
         };
 
-        return this.View(ingredientEditViewModel);
+        return this.View(addressEditViewModel);
     }
 
     // POST: UsersController/Edit/5
-    [HttpPost("Users/{userId}/Ingredients/{id}/Edit")]
+    [HttpPost("Users/{userId}/Addresss/{id}/Edit")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> EditIngredient(int userId, int id, [Bind("Id,Name,KCal,IsAllergen")] IngredientEditViewModel ingredientEditViewModel)
+    public async Task<ActionResult> EditAddress(int userId, int id, [Bind("Street, City, State, Zip, Country")] AddressEditViewModel addressEditViewModel)
     {
         if (!this.ModelState.IsValid)
-            return this.View(ingredientEditViewModel);
+            return this.View(addressEditViewModel);
 
         try
         {
-            var editIngredient = new IngredientDTO
+            var editAddress = new AddressDTO
             {
-                Id = ingredientEditViewModel.Id,
-                Name = ingredientEditViewModel.Name,
-                KCal = ingredientEditViewModel.KCal,
-                IsAllergen = ingredientEditViewModel.IsAllergen
+                Street = addressEditViewModel.Street,
+                City = addressEditViewModel.City,
+                State = addressEditViewModel.State,
+                Zip = addressEditViewModel.Zip,
+                Country = addressEditViewModel.Country,
             };
 
-            await this.userService.UpdateUserUpdateIngredientAsync(userId, id, editIngredient);
+            await this.usersService.UpdateUserUpdateAddressAsync(userId, id, editAddress);
 
             return this.RedirectToAction(nameof(this.Details), new { id = userId });
         }
@@ -262,35 +268,37 @@ public class UsersController : Controller
         }
     }
 
-    [HttpGet("Users/{userId}/Ingredients/{id}/Delete")]
-    public async Task<ActionResult> DeleteIngredient(int userId, int id)
+    [HttpGet("Users/{userId}/Addresss/{id}/Delete")]
+    public async Task<ActionResult> DeleteAddress(int userId, int id)
     {
-        var user = await this.userService.GetUserAsync(userId);
+        var user = await this.usersService.GetUserAsync(userId);
 
-        this.ViewData["userSelected"] = user.Name;
+        this.ViewData["userSelected"] = $"{user.FirstName} {user.LastName}";
         this.ViewData["userSelectedId"] = user.Id;
-        var ingredient = await this.ingredientService.GetIngredientAsync(id);
+        var address = await this.addressService.GetAddressAsync(id);
 
-        var ingredientEditViewModel = new UserIngredientViewModel
+        var addressEditViewModel = new UsersAddressViewModel
         {
-            Id = ingredient.Id,
-            Name = ingredient.Name,
-            KCal = ingredient.KCal,
-            IsAllergen = ingredient.IsAllergen,
+            Id = address.Id,
+            Street = address.Street,
+            City = address.City,
+            State = address.State,
+            Zip = address.Zip,
+            Country = address.Country,
             UserId = userId
         };
 
-        return this.View(ingredientEditViewModel);
+        return this.View(addressEditViewModel);
     }
 
     // POST: DrinksController/Delete/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> DeleteIngredientConfirmed(int userId, int id)
+    public async Task<ActionResult> DeleteAddressConfirmed(int userId, int id)
     {
         try
         {
-            await this.userService.UpdateUserDeleteIngredientAsync(userId, id);
+            await this.usersService.UpdateUserDeleteAddressAsync(userId, id);
             return this.RedirectToAction(nameof(this.Details), new { id = userId });
         }
         catch
