@@ -3,7 +3,7 @@ using EatDomicile.Web.Services.Addresses.DTO;
 
 namespace EatDomicile.Web.Services.Users.DTO;
 
-public class UserDTO
+public class UsersDTO
 {
     public int? Id { get; set; }
 
@@ -21,4 +21,5 @@ public class UserDTO
 
     [DisplayName("Adresse")]
     public AddressDTO Address { get; set; }
+
 }

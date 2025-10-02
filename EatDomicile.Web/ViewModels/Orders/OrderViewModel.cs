@@ -12,6 +12,6 @@ public class OrderViewModel
 
     public int Status { get; set; }
 
-    public UserDTO User { get; set; }
+    public UsersDTO User { get; set; }
 }
 

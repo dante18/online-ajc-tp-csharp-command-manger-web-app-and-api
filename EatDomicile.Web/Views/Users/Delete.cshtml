@@ -1,0 +1,55 @@
+﻿@model EatDomicile.Web.ViewModels.Users.UsersViewModel
+
+@{
+    ViewData["Title"] = "Supprimer user";
+}
+
+<div class="row">
+    <div class="col-6 d-flex align-items-center justify-content-start mt-3">
+        <h1>Supprimer un user</h1>
+    </div>
+    <div class="col-6 d-flex align-items-center justify-content-end">
+        <a asp-action="Index" class="btn btn-primary">Annuler et retourner sur la liste des users</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-start">
+        <h3>Êtes-vous sûr de vouloir supprimer ce user ?</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-start">
+        <dl class="row">
+            <dt class="col-sm-4">
+                Nom :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.FirstName) @(Model.LastName)
+            </dd>
+            <dt class="col-sm-4">
+                Mail :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Mail)
+            </dd>
+            <dt class="col-sm-4">
+                Phone
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Phone)
+            </dd>
+        </dl>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-start">
+        <div>
+            <form asp-action="DeleteConfirmed" method="post">
+                <input type="hidden" asp-for="Id" />
+                <div class="form-group">
+                    <input type="submit" value="Supprimer" class="btn btn-danger" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
