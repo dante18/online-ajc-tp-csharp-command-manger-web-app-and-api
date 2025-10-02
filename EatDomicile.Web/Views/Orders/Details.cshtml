@@ -1,0 +1,80 @@
+﻿@model EatDomicile.Web.ViewModels.Orders.OrderDetailsViewModel
+
+@{
+    ViewData["Title"] = "Détail commande";
+}
+
+<div class="row">
+    <div class="col-6 d-flex align-items-center justify-content-start mt-3">
+        <h1>Détail d'une commande</h1>
+    </div>
+    <div class="col-6 d-flex align-items-center justify-content-end">
+        <a asp-action="Index" class="btn btn-primary">Retourner sur la liste des commandes</a>
+        <a asp-action="Edit" asp-route-id="@(Model.Order.Id) " class="btn btn-warning ms-2">Modifier la commande</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-start">
+        <dl class="row">
+            <dt class="col-sm-4">
+                Date de la commande :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Order.OrderDate)
+            </dd>
+            <dt class="col-sm-4">
+                Date de livraison :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Order.DeliveryDate == null ? "Inconnu" : Model.Order.DeliveryDate)
+            </dd>
+            <dt class="col-sm-4">
+                Status de la commande
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Order.Status == 1 ? "En cours" : "Livrée")
+            </dd>
+            <dt class="col-sm-4">
+                Propriétaire de la commande
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Order.User.FirstName.ToUpper()) @(Model.Order.User.LastName)
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-6 d-flex align-items-center justify-content-start mt-3">
+        <h1>Liste des produits</h1>
+    </div>
+    <div class="col-6 d-flex align-items-center justify-content-end">
+        <a asp-action="AddProduct" asp-route-id="@(Model.Order.Id) " class="btn btn-warning ms-2">Ajouter un produit</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 table-responsive mt-3">
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th class="text-center">Name</th>
+                <th class="text-center">Prix</th>
+            </tr>
+            </thead>
+            <tbody>
+                @foreach (var orderProduct in Model.Products)
+            {
+                <tr>
+                        <td class="text-center">@orderProduct.Product.Name</td>
+                        <td class="text-center">@orderProduct.Product.Price</td>
+                        <td class="text-center">@orderProduct.Product.Price</td>
+                    <td class="text-center">
+                            <a asp-action="DeleteProduct" asp-route-id="@orderProduct.Product.Id"
+                               asp-route-orderId="@this.Model.Order.Id" class="btn btn-danger">Supprimer</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

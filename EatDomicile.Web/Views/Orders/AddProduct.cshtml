@@ -1,0 +1,33 @@
+﻿@model EatDomicile.Web.ViewModels.Orders.OrderProductAddViewModel
+
+@{
+    ViewData["Title"] = "Commande - Ajouter produit";
+}
+
+<div class="row">
+    <div class="col-6 d-flex align-items-center justify-content-start mt-3">
+        <h1>Ajouter le produit a la commande n°@(ViewData["orderSelected"])</h1>
+    </div>
+    <div class="col-6 d-flex align-items-center justify-content-end">
+        <a asp-action="Details" 
+           asp-route-id="@(ViewData["orderSelectedId"])"
+           class="btn btn-primary">Annuler et retourner sur le détail de la commande</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-start">
+        <form asp-action="AddProduct" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="ProductId"></label>
+                <select asp-for="ProductId" asp-items="this.Model.ProductList" class="form-select"></select>
+                <span asp-validation-for="ProductId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Ajouter" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+

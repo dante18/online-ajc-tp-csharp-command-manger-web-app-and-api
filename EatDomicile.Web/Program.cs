@@ -2,9 +2,10 @@ using EatDomicile.Web.Services.Burgers;
 using EatDomicile.Web.Services.Doughs;
 using EatDomicile.Web.Services.Drinks;
 using EatDomicile.Web.Services.Ingredients;
-using EatDomicile.Web.Services.Interfaces;
+using EatDomicile.Web.Services.Orders;
 using EatDomicile.Web.Services.Pastas;
 using EatDomicile.Web.Services.Pizzas;
+using EatDomicile.Web.Services.Products;
 using EatDomicile.Web.Services.Users;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -20,6 +21,8 @@ builder.Services.TryAddTransient<BurgersService>();
 builder.Services.TryAddTransient<PizzasService>();
 builder.Services.TryAddTransient<PastasService>();
 builder.Services.TryAddTransient<UsersService>();
+builder.Services.TryAddTransient<OrdersService>();
+builder.Services.TryAddTransient<ProductsService>();
 var uriApi = builder.Configuration.GetValue<string>("ApiSettings:BaseUrl");
 
 var app = builder.Build();

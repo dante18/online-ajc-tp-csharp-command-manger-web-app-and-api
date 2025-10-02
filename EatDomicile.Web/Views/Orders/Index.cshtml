@@ -1,0 +1,55 @@
+﻿@model IEnumerable<EatDomicile.Web.ViewModels.Orders.OrderViewModel>
+
+@{
+    ViewData["Title"] = "Commandes";
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="row">
+        <div class="col-12 d-flex align-items-center justify-content-center">
+            <div class="alert alert-danger">
+                @TempData["ErrorMessage"]
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-6 d-flex align-items-center justify-content-start">
+        <h1>Liste des commandes</h1>
+    </div>
+    <div class="col-6 d-flex align-items-center justify-content-end">
+        <a asp-action="Create" class="btn btn-primary">Ajouter une commande</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 table-responsive mt-3">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th class="text-center">Date de la commande</th>
+                    <th class="text-center">Date de livraison</th>
+                    <th class="text-center">Status de la commande</th>
+                    <th class="text-center">Propriétaire de la commande</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td class="text-center">@(order.OrderDate)</td>
+                        <td class="text-center">@(order.DeliveryDate == null ? "Inconnu" : order.DeliveryDate)</td>
+                        <td class="text-center">@(order.Status == 2 ? "Livrée" : "En cours")</td>
+                        <td class="text-center">@(order.User.FirstName.ToUpper()) @(order.User.LastName)</td>
+                        <td class="text-center">
+                            <a asp-action="Details" asp-route-id="@order.Id" class="btn btn-info">Détail</a>
+                            <a asp-action="Edit" asp-route-id="@order.Id" class="btn btn-warning">Modifier</a>
+                            <a asp-action="Delete" asp-route-id="@order.Id" class="btn btn-danger">Supprimer</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
