@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel;
-using EatDomicile.Web.Services.Addresses.DTO;
+using EatDomicile.Web.Services.Domains.Addresses.DTO;
 
 namespace EatDomicile.Web.Services.Users.DTO;
 
@@ -21,5 +21,4 @@ public class UsersDTO
 
     [DisplayName("Adresse")]
     public AddressDTO Address { get; set; }
-
 }
