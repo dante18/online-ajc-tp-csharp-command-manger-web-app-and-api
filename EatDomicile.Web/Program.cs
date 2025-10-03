@@ -1,7 +1,8 @@
 using EatDomicile.Web.Services.Burgers;
+using EatDomicile.Web.Services.Domains.Drinks;
 using EatDomicile.Web.Services.Doughs;
-using EatDomicile.Web.Services.Drinks;
 using EatDomicile.Web.Services.Ingredients;
+using EatDomicile.Web.Services.Interfaces;
 using EatDomicile.Web.Services.Orders;
 using EatDomicile.Web.Services.Pastas;
 using EatDomicile.Web.Services.Pizzas;
@@ -14,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient();
-builder.Services.TryAddTransient<DrinksService>();
+builder.Services.TryAddTransient<IApiDrinksService, DrinksService>();
 builder.Services.TryAddTransient<DoughsService>();
 builder.Services.TryAddTransient<IngredientsService>();
 builder.Services.TryAddTransient<BurgersService>();
@@ -23,7 +24,6 @@ builder.Services.TryAddTransient<PastasService>();
 builder.Services.TryAddTransient<UsersService>();
 builder.Services.TryAddTransient<OrdersService>();
 builder.Services.TryAddTransient<ProductsService>();
-var uriApi = builder.Configuration.GetValue<string>("ApiSettings:BaseUrl");
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.

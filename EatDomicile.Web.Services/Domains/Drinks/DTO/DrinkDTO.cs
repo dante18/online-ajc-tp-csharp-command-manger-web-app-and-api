@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EatDomicile.Web.Services.Drinks.DTO;
+﻿namespace EatDomicile.Web.Services.Domains.Drinks.DTO;
 
 public class DrinkDTO
 {

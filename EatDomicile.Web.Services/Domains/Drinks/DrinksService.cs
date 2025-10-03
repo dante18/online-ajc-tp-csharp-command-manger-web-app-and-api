@@ -1,11 +1,10 @@
-﻿using EatDomicile.Web.Services.Drinks.DTO;
+﻿using EatDomicile.Web.Services.Domains.Drinks.DTO;
 using EatDomicile.Web.Services.Interfaces;
 using System.Net.Http.Json;
-using System.Text;
-using System.Text.Json;
 
-namespace EatDomicile.Web.Services.Drinks;
-public class DrinksService
+namespace EatDomicile.Web.Services.Domains.Drinks;
+
+public class DrinksService : IApiDrinksService
 {
     private readonly HttpClient httpClient;
 
@@ -13,6 +12,7 @@ public class DrinksService
     {
         this.httpClient = httpClient;
     }
+
     public async Task<IEnumerable<DrinkDTO>> GetDrinksAsync()
     {
         var drinks = await httpClient.GetFromJsonAsync<IEnumerable<DrinkDTO>>("https://localhost:7001/api/drinks");
@@ -27,19 +27,19 @@ public class DrinksService
 
     public async Task CreateDrinkAsync(DrinkDTO drinkDTO)
     {
-        var response = await this.httpClient.PostAsJsonAsync("https://localhost:7001/api/drinks", drinkDTO);
+        var response = await httpClient.PostAsJsonAsync("https://localhost:7001/api/drinks", drinkDTO);
         _ = response.EnsureSuccessStatusCode();
     }
 
     public async Task UpdateDrinkAsync(int id, DrinkDTO drinkDto)
     {
-        var response = await this.httpClient.PutAsJsonAsync($"https://localhost:7001/api/drinks/{id}", drinkDto);
+        var response = await httpClient.PutAsJsonAsync($"https://localhost:7001/api/drinks/{id}", drinkDto);
         _ = response.EnsureSuccessStatusCode();
     }
 
     public async Task DeleteDrinkAsync(int id)
     {
-        var response = await this.httpClient.DeleteAsync($"https://localhost:7001/api/drinks/{id}");
+        var response = await httpClient.DeleteAsync($"https://localhost:7001/api/drinks/{id}");
         _ = response.EnsureSuccessStatusCode();
     }
 }
