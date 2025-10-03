@@ -1,15 +1,26 @@
 ﻿@model IEnumerable<EatDomicile.Web.ViewModels.Users.UsersViewModel>
 
 @{
-    ViewData["Title"] = "Users";
+    ViewData["Title"] = "Utilisateurs";
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="row">
+        <div class="col-12 d-flex align-items-center justify-content-center">
+            <div class="alert alert-danger">
+                @TempData["ErrorMessage"]
+            </div>
+        </div>
+    </div>
 }
 
 <div class="row">
     <div class="col-6 d-flex align-items-center justify-content-start">
-        <h1>Liste des users</h1>
+        <h1>Liste des utilisateurs</h1>
     </div>
     <div class="col-6 d-flex align-items-center justify-content-end">
-        <a asp-action="Create" class="btn btn-primary">Ajouter un user</a>
+        <a asp-action="Create" class="btn btn-primary">Ajouter un utilisateur</a>
     </div>
 </div>
 <div class="row">
@@ -18,18 +29,19 @@
             <thead>
                 <tr>
                     <th class="text-center">Nom</th>
-                    <th class="text-center">Prix</th>
-                    <th class="text-center">Type</th>
+                    <th class="text-center">Prénom</th>
+                    <th class="text-center">Téléphone</th>
+                    <th class="text-center">Email</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var user in Model)
                 {
                     <tr>
-                        <td class="text-center">@user.FirstName</td>
                         <td class="text-center">@user.LastName</td>
-                        <td class="text-center">@user.Mail</td>
+                        <td class="text-center">@user.FirstName</td>
                         <td class="text-center">@user.Phone</td>
+                        <td class="text-center">@user.Mail</td>
                         <td class="text-center">
                             <a asp-action="Details" asp-route-id="@user.Id" class="btn btn-info">Détail</a>
                             <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-warning">Modifier</a>

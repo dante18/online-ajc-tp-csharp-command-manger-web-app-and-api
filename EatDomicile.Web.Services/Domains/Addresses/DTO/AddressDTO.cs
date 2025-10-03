@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace EatDomicile.Web.Services.Addresses.DTO;
+namespace EatDomicile.Web.Services.Domains.Addresses.DTO;
 
 public class AddressDTO
 {

@@ -1,20 +1,20 @@
-﻿@model EatDomicile.Web.ViewModels.Users.UsersViewModel
+﻿@model EatDomicile.Web.ViewModels.Users.UsersDetailsViewModel
 
 @{
-    ViewData["Title"] = "Supprimer user";
+    ViewData["Title"] = "Supprimer utilisateur";
 }
 
 <div class="row">
     <div class="col-6 d-flex align-items-center justify-content-start mt-3">
-        <h1>Supprimer un user</h1>
+        <h1>Supprimer un utilisateur</h1>
     </div>
     <div class="col-6 d-flex align-items-center justify-content-end">
-        <a asp-action="Index" class="btn btn-primary">Annuler et retourner sur la liste des users</a>
+        <a asp-action="Index" class="btn btn-primary">Annuler et retourner sur la liste des utilisateurs</a>
     </div>
 </div>
 <div class="row">
     <div class="col-12 d-flex align-items-center justify-content-start">
-        <h3>Êtes-vous sûr de vouloir supprimer ce user ?</h3>
+        <h3>Êtes-vous sûr de vouloir supprimer cet utilisateur ?</h3>
     </div>
 </div>
 <div class="row">
@@ -24,19 +24,31 @@
                 Nom :
             </dt>
             <dd class="col-sm-8">
-                @(Model.FirstName) @(Model.LastName)
+                @(Model.User.LastName)
             </dd>
             <dt class="col-sm-4">
-                Mail :
+                Prénom :
             </dt>
             <dd class="col-sm-8">
-                @(Model.Mail)
+                @(Model.User.FirstName)
             </dd>
             <dt class="col-sm-4">
-                Phone
+                Numéro de téléphone
             </dt>
             <dd class="col-sm-8">
-                @(Model.Phone)
+                @(Model.User.Phone)
+            </dd>
+            <dt class="col-sm-4">
+                Adresse mail :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.User.Mail)
+            </dd>
+            <dt class="col-sm-4">
+                Adresse postal :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Address.Street) @(Model.Address.Zip) @(Model.Address.City), @(Model.Address.State) @(Model.Address.Country)
             </dd>
         </dl>
     </div>
@@ -45,7 +57,7 @@
     <div class="col-12 d-flex align-items-center justify-content-start">
         <div>
             <form asp-action="DeleteConfirmed" method="post">
-                <input type="hidden" asp-for="Id" />
+                <input type="hidden" name="id" value="@Model.User.Id" />
                 <div class="form-group">
                     <input type="submit" value="Supprimer" class="btn btn-danger" />
                 </div>
