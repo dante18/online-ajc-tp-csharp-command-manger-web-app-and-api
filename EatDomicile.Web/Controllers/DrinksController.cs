@@ -1,7 +1,4 @@
-﻿
-using EatDomicile.Core.Entities;
-using EatDomicile.Web.Services.Drinks;
-using EatDomicile.Web.Services.Drinks.DTO;
+﻿using EatDomicile.Web.Services.Domains.Drinks.DTO;
 using EatDomicile.Web.Services.Interfaces;
 using EatDomicile.Web.ViewModels.Drinks;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +7,9 @@ namespace EatDomicile.Web.Controllers;
 
 public class DrinksController : Controller
 {
-    private readonly DrinksService drinksService;
+    private readonly IApiDrinksService drinksService;
 
-    public DrinksController(DrinksService drinksService)
+    public DrinksController(IApiDrinksService drinksService)
     {
         this.drinksService = drinksService;
     }
@@ -34,21 +31,29 @@ public class DrinksController : Controller
     //GET DrinksController/Details/id
     public async Task<IActionResult> Details(int id)
     {
-        var drink = await this.drinksService.GetDrinkAsync(id);
-
-        if (drink is null)
+        try
         {
-            return this.NotFound();
+            var drink = await this.drinksService.GetDrinkAsync(id);
+
+            if (drink is null)
+            {
+                return this.NotFound();
+            }
+
+            return this.View(new DrinkDetailsViewModel()
+            {
+                Id = drink.Id,
+                Name = drink.Name,
+                Price = drink.Price,
+                Fizzy = drink.Fizzy,
+                KCal = drink.KCal,
+            });
         }
-
-        return this.View(new DrinkDetailsViewModel()
+        catch (Exception e)
         {
-            Id = drink.Id,
-            Name = drink.Name,
-            Price = drink.Price,
-            Fizzy = drink.Fizzy,
-            KCal = drink.KCal,
-        });
+            TempData["ErrorMessage"] = "La boisson n'existe pas ou a été supprimé!";
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     public IActionResult Create()
@@ -80,29 +85,38 @@ public class DrinksController : Controller
         }
         catch
         {
-            return this.View();
+            TempData["ErrorMessage"] = "Echec de la création de la boisson";
+            return RedirectToAction(nameof(Index));
         }
     }
 
     public async Task<ActionResult> Edit(int id)
     {
-        var drink = await this.drinksService.GetDrinkAsync(id);
-
-        if (drink is null)
+        try
         {
-            return this.NotFound();
+            var drink = await this.drinksService.GetDrinkAsync(id);
+
+            if (drink is null)
+            {
+                return this.NotFound();
+            }
+
+            var drinkEditViewModel = new DrinkEditViewModel
+            {
+                Id = drink.Id,
+                Name = drink.Name,
+                Price = drink.Price,
+                Fizzy = drink.Fizzy,
+                KCal = drink.KCal,
+            };
+
+            return this.View(drinkEditViewModel);
         }
-
-        var drinkEditViewModel = new DrinkEditViewModel
+        catch (Exception e)
         {
-            Id = drink.Id,
-            Name = drink.Name,
-            Price = drink.Price,
-            Fizzy = drink.Fizzy,
-            KCal = drink.KCal,
-        };
-
-        return this.View(drinkEditViewModel);
+            TempData["ErrorMessage"] = "La boisson n'existe pas ou a été supprimé!";
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     // POST: DrinksController/Edit/5
@@ -130,29 +144,38 @@ public class DrinksController : Controller
         }
         catch
         {
-            return this.View();
+            TempData["ErrorMessage"] = "Echec de la modification de la boisson";
+            return RedirectToAction(nameof(Index));
         }
     }
 
     public async Task<ActionResult> Delete(int id)
     {
-        var drink = await this.drinksService.GetDrinkAsync(id);
-
-        if (drink is null)
+        try
         {
-            return this.NotFound();
+            var drink = await this.drinksService.GetDrinkAsync(id);
+
+            if (drink is null)
+            {
+                return this.NotFound();
+            }
+
+            var drinkFound = new DrinkViewModel
+            {
+                Id = drink.Id,
+                Name = drink.Name,
+                Price = drink.Price,
+                Fizzy = drink.Fizzy,
+                KCal = drink.KCal,
+            };
+
+            return this.View(drinkFound);
         }
-
-        var drinkFound = new DrinkViewModel
+        catch (Exception e)
         {
-            Id = drink.Id,
-            Name = drink.Name,
-            Price = drink.Price,
-            Fizzy = drink.Fizzy,
-            KCal = drink.KCal,
-        };
-
-        return this.View(drinkFound);
+            TempData["ErrorMessage"] = "La boisson n'existe pas ou a été supprimé!";
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     // POST: DrinksController/Delete/5
@@ -167,7 +190,8 @@ public class DrinksController : Controller
         }
         catch
         {
-            return this.View(nameof(this.Details));
+            TempData["ErrorMessage"] = "Echec de la suppréssion de la boisson";
+            return RedirectToAction(nameof(Index));
         }
     }
 }
