@@ -1,9 +1,10 @@
-﻿using EatDomicile.Web.Services.Pastas.DTO;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
+using EatDomicile.Web.Services.Interfaces;
+using EatDomicile.Web.Services.Domains.Pastas.DTO;
 
-namespace EatDomicile.Web.Services.Pastas;
+namespace EatDomicile.Web.Services.Domains.Pastas;
 
-public class PastasService
+public class PastasService : IApiPastasService
 {
     private readonly HttpClient httpClient;
 
@@ -25,19 +26,19 @@ public class PastasService
 
     public async Task CreatePastaAsync(PastaDTO pastaDto)
     {
-        var response = await this.httpClient.PostAsJsonAsync("https://localhost:7001/api/pastas", pastaDto);
+        var response = await httpClient.PostAsJsonAsync("https://localhost:7001/api/pastas", pastaDto);
         _ = response.EnsureSuccessStatusCode();
     }
 
     public async Task UpdatePastaAsync(int id, PastaDTO pastaDto)
     {
-        var response = await this.httpClient.PutAsJsonAsync($"https://localhost:7001/api/pastas/{id}", pastaDto);
+        var response = await httpClient.PutAsJsonAsync($"https://localhost:7001/api/pastas/{id}", pastaDto);
         _ = response.EnsureSuccessStatusCode();
     }
 
     public async Task DeletePastaAsync(int id)
     {
-        var response = await this.httpClient.DeleteAsync($"https://localhost:7001/api/pastas/{id}");
+        var response = await httpClient.DeleteAsync($"https://localhost:7001/api/pastas/{id}");
         _ = response.EnsureSuccessStatusCode();
     }
 }

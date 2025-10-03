@@ -1,4 +1,4 @@
-﻿using EatDomicile.Web.Services.Orders.DTO;
+﻿using EatDomicile.Web.Services.Domains.Orders.DTO;
 
 namespace EatDomicile.Web.ViewModels.Orders;
 

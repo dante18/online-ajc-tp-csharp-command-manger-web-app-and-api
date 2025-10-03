@@ -1,8 +1,8 @@
 ﻿using EatDomicile.Web.Services.Domains.Users.DTO;
 
-namespace EatDomicile.Web.ViewModels.Orders;
+namespace EatDomicile.Web.Services.Domains.Orders.DTO;
 
-public class OrderViewModel
+public class OrderDTO
 {
     public int? Id { get; set; }
 
@@ -14,4 +14,3 @@ public class OrderViewModel
 
     public UserDTO User { get; set; }
 }
-

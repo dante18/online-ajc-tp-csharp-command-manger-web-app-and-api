@@ -1,4 +1,4 @@
-﻿namespace EatDomicile.Web.Services.Burgers.DTO;
+﻿namespace EatDomicile.Web.Services.Domains.Burgers.DTO;
 
 public class BurgerDTO
 {

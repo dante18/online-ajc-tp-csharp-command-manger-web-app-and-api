@@ -1,6 +1,5 @@
-﻿using EatDomicile.Web.Services.Users.DTO;
+﻿using System.ComponentModel;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel;
 
 namespace EatDomicile.Web.ViewModels.Users;
 

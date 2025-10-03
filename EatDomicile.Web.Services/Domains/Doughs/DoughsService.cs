@@ -1,9 +1,10 @@
 ﻿using System.Net.Http.Json;
-using EatDomicile.Web.Services.Doughs.DTO;
+using EatDomicile.Web.Services.Domains.Doughs.DTO;
+using EatDomicile.Web.Services.Interfaces;
 
-namespace EatDomicile.Web.Services.Doughs;
+namespace EatDomicile.Web.Services.Domains.Doughs;
 
-public class DoughsService
+public class DoughsService : IApiDoughsService
 {
     private readonly HttpClient httpClient;
 
@@ -25,19 +26,19 @@ public class DoughsService
 
     public async Task CreateDoughAsync(DoughsDTO doughsDTO)
     {
-        var response = await this.httpClient.PostAsJsonAsync("https://localhost:7001/api/doughs", doughsDTO);
+        var response = await httpClient.PostAsJsonAsync("https://localhost:7001/api/doughs", doughsDTO);
         _ = response.EnsureSuccessStatusCode();
     }
 
     public async Task UpdateDoughAsync(int id, DoughsDTO doughsDTO)
     {
-        var response = await this.httpClient.PutAsJsonAsync($"https://localhost:7001/api/doughs/{id}", doughsDTO);
+        var response = await httpClient.PutAsJsonAsync($"https://localhost:7001/api/doughs/{id}", doughsDTO);
         _ = response.EnsureSuccessStatusCode();
     }
 
     public async Task DeleteDoughAsync(int id)
     {
-        var response = await this.httpClient.DeleteAsync($"https://localhost:7001/api/doughs/{id}");
+        var response = await httpClient.DeleteAsync($"https://localhost:7001/api/doughs/{id}");
         _ = response.EnsureSuccessStatusCode();
     }
 }

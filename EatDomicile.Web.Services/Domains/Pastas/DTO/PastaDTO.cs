@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace EatDomicile.Web.Services.Pastas.DTO;
+namespace EatDomicile.Web.Services.Domains.Pastas.DTO;
 
 public class PastaDTO
 {

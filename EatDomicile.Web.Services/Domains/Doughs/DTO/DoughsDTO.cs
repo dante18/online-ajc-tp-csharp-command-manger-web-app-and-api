@@ -1,4 +1,4 @@
-﻿namespace EatDomicile.Web.Services.Doughs.DTO;
+﻿namespace EatDomicile.Web.Services.Domains.Doughs.DTO;
 
 public class DoughsDTO
 {

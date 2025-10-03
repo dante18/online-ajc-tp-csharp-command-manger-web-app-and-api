@@ -1,20 +1,22 @@
-﻿@model EatDomicile.Web.ViewModels.Pastas.PastaViewModel
+﻿@model EatDomicile.Web.ViewModels.Pizzas.PizzaIngredientViewModel
 
 @{
-    ViewData["Title"] = "Supprimer pasta";
+    ViewData["Title"] = "Pizza - Suppression ingrédient";
 }
 
 <div class="row">
     <div class="col-6 d-flex align-items-center justify-content-start mt-3">
-        <h1>Supprimer une pasta</h1>
+        <h1>Suppression l'ingrédient d'une pizza @(ViewData["pizzaSelected"])</h1>
     </div>
     <div class="col-6 d-flex align-items-center justify-content-end">
-        <a asp-action="Index" class="btn btn-primary">Annuler et retourner sur la liste des pastas</a>
+        <a asp-action="Details"
+           asp-route-id="@(ViewData["pizzaSelectedId"])"
+           class="btn btn-primary">Annuler et retourner sur le detail d'une pizza</a>
     </div>
 </div>
 <div class="row">
     <div class="col-12 d-flex align-items-center justify-content-start">
-        <h3>Êtes-vous sûr de vouloir supprimer cette pasta ?</h3>
+        <h3>Êtes-vous sûr de vouloir supprimer cette ingredient d'une pizza ?</h3>
     </div>
 </div>
 <div class="row">
@@ -27,28 +29,16 @@
                 @(Model.Name)
             </dd>
             <dt class="col-sm-4">
-                Prix :
-            </dt>
-            <dd class="col-sm-8">
-                @(Model.Price)€
-            </dd>
-            <dt class="col-sm-4">
-                Type :
-            </dt>
-            <dd class="col-sm-8">
-                @(Model.Type)
-            </dd>
-            <dt class="col-sm-4">
                 KCal :
             </dt>
             <dd class="col-sm-8">
                 @(Model.KCal)
             </dd>
             <dt class="col-sm-4">
-                Végétarien
+                Allergène
             </dt>
             <dd class="col-sm-8">
-                @(Model.Vegetarian ? "Oui" : "Non")
+                @(Model.IsAllergen ? "Oui" : "Non")
             </dd>
         </dl>
     </div>
@@ -56,8 +46,9 @@
 <div class="row">
     <div class="col-12 d-flex align-items-center justify-content-start">
         <div>
-            <form asp-action="DeleteConfirmed" method="post">
+            <form asp-action="DeleteIngredientConfirmed" method="post">
                 <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="PizzaId"/>
                 <div class="form-group">
                     <input type="submit" value="Supprimer" class="btn btn-danger" />
                 </div>

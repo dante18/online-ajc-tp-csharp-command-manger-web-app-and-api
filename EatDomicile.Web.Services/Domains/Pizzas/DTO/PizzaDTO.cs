@@ -1,7 +1,6 @@
-﻿using EatDomicile.Web.Services.Doughs.DTO;
+﻿using EatDomicile.Web.Services.Domains.Doughs.DTO;
 
-
-namespace EatDomicile.Web.Services.Pizzas.DTO;
+namespace EatDomicile.Web.Services.Domains.Pizzas.DTO;
 
 public class PizzaDTO
 {
