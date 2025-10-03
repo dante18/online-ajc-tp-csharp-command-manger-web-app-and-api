@@ -1,16 +1,16 @@
 ﻿@model EatDomicile.Web.ViewModels.Users.UsersDetailsViewModel
 
 @{
-    ViewData["Title"] = "Détail user";
+    ViewData["Title"] = "Détail utilisateur";
 }
 
 <div class="row">
     <div class="col-6 d-flex align-items-center justify-content-start mt-3">
-        <h1>Détail d'un user</h1>
+        <h1>Détail d'un utilisateur</h1>
     </div>
     <div class="col-6 d-flex align-items-center justify-content-end">
-        <a asp-action="Index" class="btn btn-primary">Retourner sur la liste des users</a>
-        <a asp-action="Edit" asp-route-id="@(Model.User.Id) " class="btn btn-warning ms-2">Modifier le user</a>
+        <a asp-action="Index" class="btn btn-primary">Retourner sur la liste des utilisateurs</a>
+        <a asp-action="Edit" asp-route-id="@(Model.User.Id) " class="btn btn-warning ms-2">Modifier l'utilisateur</a>
     </div>
 </div>
 <div class="row">
@@ -20,13 +20,13 @@
                 Nom :
             </dt>
             <dd class="col-sm-8">
-                @(Model.User.FirstName) @(Model.User.LastName)
+                @(Model.User.LastName)
             </dd>
             <dt class="col-sm-4">
-                Mail :
+                Prénom :
             </dt>
             <dd class="col-sm-8">
-                @(Model.User.Mail)
+                @(Model.User.FirstName)
             </dd>
             <dt class="col-sm-4">
                 Numéro de téléphone
@@ -34,52 +34,18 @@
             <dd class="col-sm-8">
                 @(Model.User.Phone)
             </dd>
+            <dt class="col-sm-4">
+                Adresse mail :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.User.Mail)
+            </dd>
+            <dt class="col-sm-4">
+                Adresse postal :
+            </dt>
+            <dd class="col-sm-8">
+                @(Model.Address.Street) @(Model.Address.Zip) @(Model.Address.City), @(Model.Address.State) @(Model.Address.Country)
+            </dd>
         </dl>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-6 d-flex align-items-center justify-content-start mt-3">
-        <h1>Liste des addresss</h1>
-    </div>
-    <div class="col-6 d-flex align-items-center justify-content-end">
-        <a asp-action="AddAddress" asp-route-id="@(Model.User.Id) " class="btn btn-warning ms-2">Ajouter une adresse</a>
-    </div>
-</div>
-<div class="row">
-    <div class="col-12 table-responsive mt-3">
-        <table class="table table-bordered table-striped">
-            <thead>
-            <tr>
-                <th class="text-center">Rue</th>
-                <th class="text-center">Ville</th>
-                <th class="text-center">Région</th>
-                <th class="text-center">Code Postal</th>
-                <th class="text-center">Pays</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center">@Model.Address.Street</td>
-                    <td class="text-center">@Model.Address.City)</td>
-                    <td class="text-center">@Model.Address.State</td>
-                    <td class="text-center">@Model.Address.Zip</td>
-                    <td class="text-center">@Model.Address.Country</td>
-                    <td class="text-center">
-                        <a asp-action="EditAddress"
-                           asp-route-id="@Model.Address.Id"
-                           asp-route-userId="@this.Model.User.Id"
-                            class="btn btn-warning"
-                        >
-                            Modifier
-                        </a>
-                        <a asp-action="DeleteAddress" asp-route-id="@Model.Address.Id"
-                           asp-route-userId="@this.Model.User.Id" class="btn btn-danger">
-                            Supprimer
-                        </a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
     </div>
 </div>

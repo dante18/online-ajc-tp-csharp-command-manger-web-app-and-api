@@ -1,4 +1,4 @@
-﻿using EatDomicile.Web.Services.Doughs.DTO;
+﻿using EatDomicile.Web.Services.Domains.Doughs.DTO;
 using System.ComponentModel;
 
 namespace EatDomicile.Web.ViewModels.Pizzas;

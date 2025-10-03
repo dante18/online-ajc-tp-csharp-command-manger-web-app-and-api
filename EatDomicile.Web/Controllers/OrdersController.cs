@@ -1,9 +1,7 @@
-﻿using EatDomicile.Web.Services.Addresses.DTO;
-using EatDomicile.Web.Services.Orders;
-using EatDomicile.Web.Services.Orders.DTO;
-using EatDomicile.Web.Services.Products;
-using EatDomicile.Web.Services.Users;
-using EatDomicile.Web.Services.Users.DTO;
+﻿using EatDomicile.Web.Services.Domains.Addresses.DTO;
+using EatDomicile.Web.Services.Domains.Orders.DTO;
+using EatDomicile.Web.Services.Domains.Users.DTO;
+using EatDomicile.Web.Services.Interfaces;
 using EatDomicile.Web.ViewModels.Orders;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -12,13 +10,13 @@ namespace EatDomicile.Web.Controllers;
 
 public class OrdersController : Controller
 {
-    private readonly OrdersService orderService;
+    private readonly IApiOrdersService orderService;
 
-    private readonly ProductsService productService;
+    private readonly IApiProductsService productService;
 
-    private readonly UsersService usersService;
+    private readonly IApiUsersService usersService;
 
-    public OrdersController(OrdersService orderService, ProductsService productService, UsersService usersService)
+    public OrdersController(IApiOrdersService orderService, IApiProductsService productService, IApiUsersService usersService)
     {
         this.orderService = orderService;
         this.productService = productService;
@@ -36,7 +34,7 @@ public class OrdersController : Controller
             OrderDate = order.OrderDate,
             DeliveryDate = order.DeliveryDate,
             Status = order.Status,
-            User = new UsersDTO()
+            User = new UserDTO()
             {
                 Id = order.User.Id,
                 FirstName = order.User.FirstName,
@@ -74,7 +72,7 @@ public class OrdersController : Controller
                 OrderDate = order.OrderDate,
                 DeliveryDate = order.DeliveryDate,
                 Status = order.Status,
-                User = new UsersDTO()
+                User = new UserDTO()
                 {
                     Id = order.User.Id,
                     FirstName = order.User.FirstName,
@@ -142,7 +140,8 @@ public class OrdersController : Controller
         }
         catch
         {
-            return this.View();
+            TempData["ErrorMessage"] = "Echec de la création de la commande";
+            return RedirectToAction(nameof(Index));
         }
     }
 
@@ -203,7 +202,8 @@ public class OrdersController : Controller
         }
         catch
         {
-            return this.View();
+            TempData["ErrorMessage"] = "Echec de la modification de la commande";
+            return RedirectToAction(nameof(Index));
         }
     }
 
@@ -224,7 +224,7 @@ public class OrdersController : Controller
                 OrderDate = order.OrderDate,
                 DeliveryDate = order.DeliveryDate,
                 Status = order.Status,
-                User = new UsersDTO()
+                User = new UserDTO()
                 {
                     Id = order.User.Id,
                     FirstName = order.User.FirstName,
@@ -270,7 +270,8 @@ public class OrdersController : Controller
         }
         catch
         {
-            return this.View(nameof(this.Index));
+            TempData["ErrorMessage"] = "Echec de la suppréssion de la commande";
+            return RedirectToAction(nameof(Index));
         }
     }
 

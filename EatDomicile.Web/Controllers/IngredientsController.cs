@@ -1,36 +1,36 @@
-﻿using EatDomicile.Web.Services.Ingredient.DTO;
-using EatDomicile.Web.Services.Ingredients;
-using EatDomicile.Web.ViewModels.Drinks;
+﻿using EatDomicile.Web.Services.Domains.Ingredients.DTO;
+using EatDomicile.Web.Services.Interfaces;
 using EatDomicile.Web.ViewModels.Ingredients;
 using Microsoft.AspNetCore.Mvc;
 
-namespace EatDomicile.Web.Controllers
+namespace EatDomicile.Web.Controllers;
+
+public class IngredientsController : Controller
 {
-    public class IngredientsController : Controller
+    private readonly IApiIngredientsService ingredientService;
+
+    public IngredientsController(IApiIngredientsService ingredientService)
     {
-        private readonly IngredientsService ingredientService;
+        this.ingredientService = ingredientService;
+    }
 
-        public IngredientsController(IngredientsService ingredientService)
+    // GET: IngredientsController
+    public async Task<IActionResult> Index()
+    {
+        var ingredients = await this.ingredientService.GetIngredientsAsync();
+        return View(ingredients.Select(static ingredient => new IngredientViewModel()
         {
-            this.ingredientService = ingredientService;
-        }
+            Id = ingredient.Id,
+            Name = ingredient.Name,
+            KCal = ingredient.KCal,
+            IsAllergen = ingredient.IsAllergen
+        }));
+    }
 
-
-        // GET: IngredientsController
-        public async Task<IActionResult> Index()
-        {
-            var ingredients = await this.ingredientService.GetIngredientsAsync();
-            return View(ingredients.Select(static ingredient => new IngredientViewModel()
-            {
-                Id = ingredient.Id,
-                Name = ingredient.Name,
-                KCal = ingredient.KCal,
-                IsAllergen = ingredient.IsAllergen
-            }));
-        }
-
-        // GET: IngredientsController/Details/5
-        public async Task<IActionResult> Details(int id)
+    // GET: IngredientsController/Details/5
+    public async Task<IActionResult> Details(int id)
+    {
+        try
         {
             var ingredient = await this.ingredientService.GetIngredientAsync(id);
 
@@ -47,42 +47,49 @@ namespace EatDomicile.Web.Controllers
                 IsAllergen = ingredient.IsAllergen
             });
         }
-
-
-        public IActionResult Create()
+        catch (Exception e)
         {
-            var ingredientCreateViewModel = new IngredientCreateViewModel();
+            TempData["ErrorMessage"] = "L'ingrédient n'existe pas ou a été supprimé!";
+            return RedirectToAction(nameof(Index));
+        }
+    }
+
+    public IActionResult Create()
+    {
+        var ingredientCreateViewModel = new IngredientCreateViewModel();
+        return this.View(ingredientCreateViewModel);
+    }
+
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> Create([Bind("Name,KCal,IsAllergen")] IngredientCreateViewModel ingredientCreateViewModel)
+    {
+        if (!this.ModelState.IsValid)
             return this.View(ingredientCreateViewModel);
-        }
 
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind("Name,KCal,IsAllergen")] IngredientCreateViewModel ingredientCreateViewModel)
+        try
         {
-            if (!this.ModelState.IsValid)
-                return this.View(ingredientCreateViewModel);
-
-            try
+            var newIngredient = new IngredientDTO
             {
-                var newIngredient = new IngredientDTO
-                {
-                    Name = ingredientCreateViewModel.Name,
-                    KCal = ingredientCreateViewModel.KCal,
-                    IsAllergen = ingredientCreateViewModel.IsAllergen
-                };
+                Name = ingredientCreateViewModel.Name,
+                KCal = ingredientCreateViewModel.KCal,
+                IsAllergen = ingredientCreateViewModel.IsAllergen
+            };
 
-                await this.ingredientService.CreateIngredientAsync(newIngredient);
-                return this.RedirectToAction(nameof(this.Index));
-            }
-            catch
-            {
-                return this.View();
-            }
+            await this.ingredientService.CreateIngredientAsync(newIngredient);
+            return this.RedirectToAction(nameof(this.Index));
         }
+        catch
+        {
+            TempData["ErrorMessage"] = "Echec de la création de l'ingrédient";
+            return RedirectToAction(nameof(Index));
+        }
+    }
 
-
-        public async Task<ActionResult> Edit(int id)
+    public async Task<ActionResult> Edit(int id)
+    {
+        try
         {
             var ingredient = await this.ingredientService.GetIngredientAsync(id);
 
@@ -101,36 +108,45 @@ namespace EatDomicile.Web.Controllers
 
             return this.View(ingredientEditViewModel);
         }
-
-        // POST: IngredientsController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(int id, [Bind("Id,Name,KCal,IsAllergen")] IngredientEditViewModel ingredientEditViewModel)
+        catch (Exception e)
         {
-            if (!this.ModelState.IsValid)
-                return this.View(ingredientEditViewModel);
-
-            try
-            {
-                var editIngredient = new IngredientDTO
-                {
-                    Id = ingredientEditViewModel.Id,
-                    Name = ingredientEditViewModel.Name,
-                    KCal = ingredientEditViewModel.KCal,
-                    IsAllergen = ingredientEditViewModel.IsAllergen
-                };
-
-                await this.ingredientService.UpdateIngredientAsync(id, editIngredient);
-
-                return this.RedirectToAction(nameof(this.Index));
-            }
-            catch
-            {
-                return this.View();
-            }
+            TempData["ErrorMessage"] = "L'ingrédient n'existe pas ou a été supprimé!";
+            return RedirectToAction(nameof(Index));
         }
+    }
 
-        public async Task<ActionResult> Delete(int id)
+    // POST: IngredientsController/Edit/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> Edit(int id, [Bind("Id,Name,KCal,IsAllergen")] IngredientEditViewModel ingredientEditViewModel)
+    {
+        if (!this.ModelState.IsValid)
+            return this.View(ingredientEditViewModel);
+
+        try
+        {
+            var editIngredient = new IngredientDTO
+            {
+                Id = ingredientEditViewModel.Id,
+                Name = ingredientEditViewModel.Name,
+                KCal = ingredientEditViewModel.KCal,
+                IsAllergen = ingredientEditViewModel.IsAllergen
+            };
+
+            await this.ingredientService.UpdateIngredientAsync(id, editIngredient);
+
+            return this.RedirectToAction(nameof(this.Index));
+        }
+        catch
+        {
+            TempData["ErrorMessage"] = "Echec de la modification de l'ingrédient";
+            return RedirectToAction(nameof(Index));
+        }
+    }
+
+    public async Task<ActionResult> Delete(int id)
+    {
+        try
         {
             var ingredient = await this.ingredientService.GetIngredientAsync(id);
 
@@ -149,21 +165,27 @@ namespace EatDomicile.Web.Controllers
 
             return this.View(ingredientFound);
         }
-
-        // POST: DrinksController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> DeleteConfirmed(int id)
+        catch (Exception e)
         {
-            try
-            {
-                await this.ingredientService.DeleteIngredientAsync(id);
-                return this.RedirectToAction(nameof(this.Index));
-            }
-            catch
-            {
-                return this.View(nameof(this.Details));
-            }
+            TempData["ErrorMessage"] = "L'ingrédient n'existe pas ou a été supprimé!";
+            return RedirectToAction(nameof(Index));
+        }
+    }
+
+    // POST: DrinksController/Delete/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> DeleteConfirmed(int id)
+    {
+        try
+        {
+            await this.ingredientService.DeleteIngredientAsync(id);
+            return this.RedirectToAction(nameof(this.Index));
+        }
+        catch
+        {
+            TempData["ErrorMessage"] = "Echec de la suppréssion de l'ingrédient";
+            return RedirectToAction(nameof(Index));
         }
     }
 }
