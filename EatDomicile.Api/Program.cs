@@ -1,29 +1,9 @@
+using EatDomicile.Api.Extensions;
 using EatDomicile.Core.Context;
 using EatDomicile.Core.Seeders;
-using EatDomicile.Core.Services;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
-builder.Services.AddDbContext<CommandStoreContext>(options => options.UseSqlServer());
-builder.Services.AddTransient<BurgerService>();
-builder.Services.AddTransient<DoughsService>();
-builder.Services.AddTransient<DrinkService>();
-builder.Services.AddTransient<FoodService>();
-builder.Services.AddTransient<IngredientService>();
-builder.Services.AddTransient<OrderService>();
-builder.Services.AddTransient<PastaService>();
-builder.Services.AddTransient<PizzaService>();
-builder.Services.AddTransient<ProductService>();
-builder.Services.AddTransient<UserService>();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddEatDomicileApi(builder.Configuration);
 
 var app = builder.Build();
 
