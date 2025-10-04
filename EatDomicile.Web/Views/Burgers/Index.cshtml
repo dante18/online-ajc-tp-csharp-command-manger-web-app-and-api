@@ -4,6 +4,17 @@
     ViewData["Title"] = "Burgers";
 }
 
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="row">
+        <div class="col-12 d-flex align-items-center justify-content-center">
+            <div class="alert alert-danger">
+                @TempData["ErrorMessage"]
+            </div>
+        </div>
+    </div>
+}
+
 <div class="row">
     <div class="col-6 d-flex align-items-center justify-content-start">
         <h1>Liste des burgers</h1>

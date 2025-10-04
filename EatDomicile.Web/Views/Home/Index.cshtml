@@ -1,8 +1,146 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model EatDomicile.Web.ViewModels.Stats.StatsViewModel
+
+@{
+    ViewData["Title"] = "Accueil";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row">
+    <div class="col-6">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Nombre de commandes par statut</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th colspan="2" class="text-white text-center p-2"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="text-center p-2">Nombre total de commande</td>
+                                <td class="text-center p-2">@Model.totalNumberOrder</td>
+                            </tr>
+                            <tr>
+                                <td class="text-center p-2">Temps moyen de livraison</td>
+                                <td class="text-center p-2">@Model.AverageDeliveryTimeHours</td>
+                            </tr>
+                            @foreach (var item in Model.totalNumberOrderByStatus)
+                            {
+                                <tr>
+                                    <td class="text-center p-2">Status @item.Label</td>
+                                    <td class="text-center p-2">@item.Value</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Nombre de commandes par utilisateur</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th colspan="2" class="text-white text-center p-2"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="text-center p-2">Nombre total de commande</td>
+                                <td class="text-center p-2">@Model.totalNumberOrder</td>
+                            </tr>
+                            @foreach (var item in Model.totalNumberOrderByUser)
+                            {
+                                <tr>
+                                    <td class="text-center p-2">@item.Label</td>
+                                    <td class="text-center p-2">@item.Value</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6 mt-3">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Nombre de commandes par jour</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th colspan="2" class="text-white text-center p-2"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="text-center p-2">Nombre total de commande</td>
+                                <td class="text-center p-2">@Model.totalNumberOrder</td>
+                            </tr>
+                            @foreach (var item in Model.totalNumberOrderByDay)
+                            {
+                                <tr>
+                                    <td class="text-center p-2">Status @item.Label</td>
+                                    <td class="text-center p-2">@item.Value</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 mt-3">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Liste des utilisateurs avec le plus de commandes</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th colspan="2" class="text-white text-center p-2"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="text-center p-2">Nombre total de commande</td>
+                                <td class="text-center p-2">@Model.totalNumberOrder</td>
+                            </tr>
+                            @foreach (var item in Model.userMoreOrder)
+                            {
+                                <tr>
+                                    <td class="text-center p-2">Status @item.Label</td>
+                                    <td class="text-center p-2">@item.Value</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

@@ -44,6 +44,7 @@ public class DoughsController : Controller
         return Results.Ok(doughsDto);
     }
 
+    [HttpPost]
     public IResult CreateDough([FromBody] CreateOrUpdateDoughsDto dto)
     {
         if (!ModelState.IsValid)

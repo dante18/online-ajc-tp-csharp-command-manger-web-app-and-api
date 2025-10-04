@@ -1,4 +1,4 @@
-﻿using EatDomicile.Web.Services.Users.DTO;
+﻿using EatDomicile.Web.Services.Domains.Users.DTO;
 
 namespace EatDomicile.Web.ViewModels.Orders;
 
@@ -12,6 +12,6 @@ public class OrderViewModel
 
     public int Status { get; set; }
 
-    public UsersDTO User { get; set; }
+    public UserDTO User { get; set; }
 }
 

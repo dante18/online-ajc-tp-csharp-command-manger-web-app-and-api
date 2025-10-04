@@ -1,12 +1,13 @@
-using EatDomicile.Web.Services.Burgers;
-using EatDomicile.Web.Services.Doughs;
-using EatDomicile.Web.Services.Drinks;
-using EatDomicile.Web.Services.Ingredients;
-using EatDomicile.Web.Services.Orders;
-using EatDomicile.Web.Services.Pastas;
-using EatDomicile.Web.Services.Pizzas;
-using EatDomicile.Web.Services.Products;
-using EatDomicile.Web.Services.Users;
+using EatDomicile.Web.Services.Domains.Burgers;
+using EatDomicile.Web.Services.Domains.Doughs;
+using EatDomicile.Web.Services.Domains.Drinks;
+using EatDomicile.Web.Services.Domains.Ingredients;
+using EatDomicile.Web.Services.Domains.Orders;
+using EatDomicile.Web.Services.Domains.Pastas;
+using EatDomicile.Web.Services.Domains.Pizzas;
+using EatDomicile.Web.Services.Domains.Statistics;
+using EatDomicile.Web.Services.Domains.Users;
+using EatDomicile.Web.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,16 +15,16 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient();
-builder.Services.TryAddTransient<DrinksService>();
-builder.Services.TryAddTransient<DoughsService>();
-builder.Services.TryAddTransient<IngredientsService>();
-builder.Services.TryAddTransient<BurgersService>();
-builder.Services.TryAddTransient<PizzasService>();
-builder.Services.TryAddTransient<PastasService>();
-builder.Services.TryAddTransient<UsersService>();
-builder.Services.TryAddTransient<OrdersService>();
-builder.Services.TryAddTransient<ProductsService>();
-var uriApi = builder.Configuration.GetValue<string>("ApiSettings:BaseUrl");
+builder.Services.TryAddTransient<IApiDrinksService, DrinksService>();
+builder.Services.TryAddTransient<IApiDoughsService, DoughsService>();
+builder.Services.TryAddTransient<IApiIngredientsService, IngredientsService>();
+builder.Services.TryAddTransient<IApiBurgersService, BurgersService>();
+builder.Services.TryAddTransient<IApiPizzasService, PizzasService>();
+builder.Services.TryAddTransient<IApiPastasService, PastasService>();
+builder.Services.TryAddTransient<IApiUsersService, UsersService>();
+builder.Services.TryAddTransient<IApiOrdersService, OrdersService>();
+builder.Services.TryAddTransient<IApiProductsService, ProductsService>();
+builder.Services.TryAddTransient<IApiStatisticsService, StatisticsService>();
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.

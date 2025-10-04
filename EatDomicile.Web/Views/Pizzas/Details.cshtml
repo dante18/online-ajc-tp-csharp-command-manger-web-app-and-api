@@ -10,7 +10,7 @@
     </div>
     <div class="col-6 d-flex align-items-center justify-content-end">
         <a asp-action="Index" class="btn btn-primary">Retourner sur la liste des pizzas</a>
-        <a asp-action="Edit" asp-route-id="@(Model.Id) " class="btn btn-warning ms-2">Modifier la pizza</a>
+        <a asp-action="Edit" asp-route-id="@(Model.Pizza.Id) " class="btn btn-warning ms-2">Modifier la pizza</a>
     </div>
 </div>
 <div class="row">
@@ -20,26 +20,67 @@
                 Nom :
             </dt>
             <dd class="col-sm-8">
-                @(Model.Name)
+                @(Model.Pizza.Name)
             </dd>
             <dt class="col-sm-4">
                 Prix :
             </dt>
             <dd class="col-sm-8">
-                @(Model.Price)€
+                @(Model.Pizza.Price)€
             </dd>
             <dt class="col-sm-4">
                 Pâte :
             </dt>
             <dd class="col-sm-8">
-                @(Model.Doughs.Name)
+                @(Model.Pizza.Doughs.Name)
             </dd>
             <dt class="col-sm-4">
                 Végétarien
             </dt>
             <dd class="col-sm-8">
-                @(Model.Vegetarian ? "Oui" : "Non")
+                @(Model.Pizza.Vegetarian ? "Oui" : "Non")
             </dd>
         </dl>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-6 d-flex align-items-center justify-content-start mt-3">
+        <h1>Liste des ingredients</h1>
+    </div>
+    <div class="col-6 d-flex align-items-center justify-content-end">
+        <a asp-action="AddIngredient" asp-route-id="@(Model.Pizza.Id) " class="btn btn-warning ms-2">Ajouter un ingrédient</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 table-responsive mt-3">
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th class="text-center">Nom</th>
+                <th class="text-center">Allergène</th>
+                <th class="text-center">KCal</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var ingredient in Model.Ingredients)
+            {
+                <tr>
+                    <td class="text-center">@ingredient.Name</td>
+                    <td class="text-center">@(ingredient.IsAllergen ? "Oui" : "Non")</td>
+                    <td class="text-center">@ingredient.KCal</td>
+                    <td class="text-center">
+                        <a asp-action="EditIngredient" 
+                           asp-route-id="@ingredient.Id" 
+                           asp-route-pizzaId="@this.Model.Pizza.Id"
+                           class="btn btn-warning"
+                        >Modifier</a>
+                        <a asp-action="DeleteIngredient" asp-route-id="@ingredient.Id" 
+                           asp-route-pizzaId="@this.Model.Pizza.Id" class="btn btn-danger">Supprimer</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
     </div>
 </div>
