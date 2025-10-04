@@ -1,21 +1,39 @@
 using EatDomicile.Web.Models;
+using EatDomicile.Web.Services.Interfaces;
+using EatDomicile.Web.ViewModels.Pizzas;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using EatDomicile.Web.ViewModels.Stats;
 
-namespace BookStore.web.Controllers;
+namespace EatDomicile.web.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
+    private readonly IApiStatisticsService statisticsService;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(IApiStatisticsService statisticsService)
     {
-        _logger = logger;
+        this.statisticsService = statisticsService;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View();
+        var totalOrders = await this.statisticsService.GetTotalOrdersAsync();
+        var totalOrdersByStatus = await this.statisticsService.GetTotalOrdersByStatusAsync();
+        var totalOrdersByUser = await this.statisticsService.GetTotalOrdersByUserAsync();
+        var totalOrdersByDay = await this.statisticsService.GetTotalOrdersByDayAsync();
+        var userMoreOrder = await this.statisticsService.GetUserWitheMoreOrderAsync();
+        var AverageDeliveryTimeHours = await this.statisticsService.GetOrderAverageDeliveryTimeHoursAsync();
+
+        return View(new StatsViewModel()
+        {
+            totalNumberOrder = totalOrders.Value,
+            totalNumberOrderByStatus = totalOrdersByStatus,
+            totalNumberOrderByUser = totalOrdersByUser,
+            totalNumberOrderByDay = totalOrdersByDay,
+            userMoreOrder = userMoreOrder,
+            AverageDeliveryTimeHours = AverageDeliveryTimeHours.ValueDouble ?? 0
+        });
     }
 
     public IActionResult Privacy()

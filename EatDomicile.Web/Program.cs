@@ -5,6 +5,7 @@ using EatDomicile.Web.Services.Domains.Ingredients;
 using EatDomicile.Web.Services.Domains.Orders;
 using EatDomicile.Web.Services.Domains.Pastas;
 using EatDomicile.Web.Services.Domains.Pizzas;
+using EatDomicile.Web.Services.Domains.Statistics;
 using EatDomicile.Web.Services.Domains.Users;
 using EatDomicile.Web.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -23,6 +24,7 @@ builder.Services.TryAddTransient<IApiPastasService, PastasService>();
 builder.Services.TryAddTransient<IApiUsersService, UsersService>();
 builder.Services.TryAddTransient<IApiOrdersService, OrdersService>();
 builder.Services.TryAddTransient<IApiProductsService, ProductsService>();
+builder.Services.TryAddTransient<IApiStatisticsService, StatisticsService>();
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
