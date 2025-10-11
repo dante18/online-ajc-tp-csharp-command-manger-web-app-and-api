@@ -1,4 +1,4 @@
-name: .NET
+name: Pipeline PR
 
 on:
   pull_request:
@@ -10,15 +10,21 @@ env:
   BUILD_CONFIGURATION: 'Release'
 
 jobs:
-  dotnet:
-    name: Install Framework
+  build:
+    name: Build sur Ubuntu
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup .NET SDK
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.PROJECT_NAME }}
+
+      - name: Build project
+        run: dotnet build ${{ env.PROJECT_NAME }} --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
