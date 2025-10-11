@@ -45,3 +45,12 @@ EatDomicile.sln
 ## Configuration techniques
 - **API** : https://localhost:7001, http://localhost:5001
 - **Web** : https://localhost:7000, http://localhost:5000
+
+## Lancement
+1. Se placer dans le dossier EatDomicile.API.Core
+2. Exécuter la commande dotnet ef database update --startup-project ../EatDomicile.Api --context IdentityContext
+3. Exécuter la commande dotnet ef database update --startup-project ../EatDomicile.Api --context ApplicationStoreContext
+4. Configurer le lancement des projets EatDomicile.API et EatDomicile.Web dans Visual Studio
+5. Cliquez sur le bouton Démarrer
+
+Remarque : Si vous souhaitez créer une nouvelle migration, vous trouverez la commande à exécuter dans le fichier Readme.md dans le dossier de migration lié au contexte ciblé.

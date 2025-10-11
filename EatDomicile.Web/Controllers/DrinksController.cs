@@ -1,6 +1,7 @@
-﻿using EatDomicile.Web.Services.Domains.Drinks.DTO;
-using EatDomicile.Web.Services.Interfaces;
-using EatDomicile.Web.ViewModels.Drinks;
+﻿using EatDomicile.Web.Services.Abstractions.Application;
+using EatDomicile.Web.Services.Dtos.Application.Drinks;
+using EatDomicile.Web.ViewsModels.Drinks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EatDomicile.Web.Controllers;
@@ -15,20 +16,31 @@ public class DrinksController : Controller
     }
 
     //GET DrinksController
-    public async Task<IActionResult> Index()
+    [Authorize()]
+    public async Task<IActionResult> Index(int page = 1)
     {
-        var drinks = await this.drinksService.GetDrinksAsync();
-        return View(drinks.Select(static drink => new DrinkViewModel()
+        var response = await this.drinksService.GetDrinksAsync(page);
+        DrinkListViewModel model = new DrinkListViewModel()
         {
-            Id = drink.Id,
-            Name = drink.Name,
-            Price = drink.Price,
-            Fizzy = drink.Fizzy,
-            KCal = drink.KCal,
-        }));
+            Items = response.Items.Select(drink => new DrinkViewModel()
+            {
+                Id = drink.Id,
+                Name = drink.Name,
+                Price = drink.Price,
+                Fizzy = drink.Fizzy,
+                KCal = drink.KCal,
+            }).ToList(),
+            currentPage = response.currentPage,
+            maxPage = response.maxPage,
+            nextPage = response.nextPage,
+            previousPage = response.previousPage
+        };
+
+        return View(model);
     }
 
     //GET DrinksController/Details/id
+    [Authorize()]
     public async Task<IActionResult> Details(int id)
     {
         try
@@ -56,6 +68,7 @@ public class DrinksController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public IActionResult Create()
     {
         var drinkCreateViewModel = new DrinkCreateViewModel();
@@ -65,6 +78,7 @@ public class DrinksController : Controller
     // POST: DrinksController/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Create([Bind("Name,Price,Fizzy,KCal")] DrinkCreateViewModel drinkCreateViewModel)
     {
         if (!this.ModelState.IsValid)
@@ -90,6 +104,7 @@ public class DrinksController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Edit(int id)
     {
         try
@@ -122,6 +137,7 @@ public class DrinksController : Controller
     // POST: DrinksController/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Edit(int id, [Bind("Id,Name,Price,Fizzy,KCal")] DrinkEditViewModel drinkEditViewModel)
     {
         if (!this.ModelState.IsValid)
@@ -149,6 +165,7 @@ public class DrinksController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Delete(int id)
     {
         try
@@ -181,6 +198,7 @@ public class DrinksController : Controller
     // POST: DrinksController/Delete/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteConfirmed(int id)
     {
         try

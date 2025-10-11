@@ -1,8 +1,9 @@
-﻿using EatDomicile.Web.Services.Domains.Burgers.DTO;
-using EatDomicile.Web.Services.Domains.Ingredients.DTO;
-using EatDomicile.Web.Services.Interfaces;
-using EatDomicile.Web.ViewModels.Burgers;
-using EatDomicile.Web.ViewModels.Ingredients;
+﻿using EatDomicile.Web.Services.Abstractions.Application;
+using EatDomicile.Web.Services.Dtos.Application.Burgers;
+using EatDomicile.Web.Services.Dtos.Application.Ingredients;
+using EatDomicile.Web.ViewsModels.Burgers;
+using EatDomicile.Web.ViewsModels.Ingredients;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EatDomicile.Web.Controllers;
@@ -21,19 +22,30 @@ public class BurgersController : Controller
 
 
     // GET: BurgersController
-    public async Task<IActionResult> Index()
+    [Authorize()]
+    public async Task<IActionResult> Index(int page = 1)
     {
-        var burgers = await this.burgerService.GetBurgersAsync();
-        return View(burgers.Select(static burger => new BurgerViewModel()
+        var response = await this.burgerService.GetBurgersAsync(page);
+        BurgerListViewModel model = new BurgerListViewModel()
         {
-            Id = burger.Id,
-            Name = burger.Name,
-            Price = burger.Price,
-            Vegetarian = burger.Vegetarian
-        }));
+            Items = response.Items.Select(burger => new BurgerViewModel()
+            {
+                Id = burger.Id,
+                Name = burger.Name,
+                Price = burger.Price,
+                Vegetarian = burger.Vegetarian
+            }).ToList(),
+            currentPage = response.currentPage,
+            maxPage = response.maxPage,
+            nextPage = response.nextPage,
+            previousPage = response.previousPage
+        };
+
+        return View(model);
     }
 
     // GET: BurgersController/Details/5
+    [Authorize()]
     public async Task<IActionResult> Details(int id)
     {
         try
@@ -69,6 +81,7 @@ public class BurgersController : Controller
     }
 
 
+    [Authorize(Roles = "Admin")]
     public IActionResult Create()
     {
         var burgerCreateViewModel = new BurgerCreateViewModel();
@@ -78,6 +91,7 @@ public class BurgersController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Create([Bind("Name,Price,Vegetarian")] BurgerCreateViewModel burgerCreateViewModel)
     {
         if (!this.ModelState.IsValid)
@@ -102,6 +116,7 @@ public class BurgersController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Edit(int id)
     {
         try
@@ -133,6 +148,7 @@ public class BurgersController : Controller
     // POST: BurgersController/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Edit(int id, [Bind("Id,Name,Price,Vegetarian")] BurgerEditViewModel burgerEditViewModel)
     {
         if (!this.ModelState.IsValid)
@@ -159,6 +175,7 @@ public class BurgersController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Delete(int id)
     {
         try
@@ -187,9 +204,10 @@ public class BurgersController : Controller
         }
     }
 
-    // POST: DrinksController/Delete/5
+    // POST: BurgersController/Delete/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteConfirmed(int id)
     {
         try
@@ -206,6 +224,7 @@ public class BurgersController : Controller
 
 
     [HttpGet("Burgers/{id}/Ingredients/Add")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AddIngredient(int id)
     {
         var burger = await this.burgerService.GetBurgerAsync(id);
@@ -218,6 +237,7 @@ public class BurgersController : Controller
 
     // POST: BurgersController/Edit/5
     [HttpPost("Burgers/{id}/Ingredients/Add")]
+    [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> AddIngredient(int id, [Bind("Name,KCal,IsAllergen")] IngredientCreateViewModel ingredientCreateViewModel)
     {
@@ -244,6 +264,7 @@ public class BurgersController : Controller
     }
 
     [HttpGet("Burgers/{burgerId}/Ingredients/{id}/Edit")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> EditIngredient(int burgerId, int id)
     {
         var burger = await this.burgerService.GetBurgerAsync(burgerId);
@@ -265,6 +286,7 @@ public class BurgersController : Controller
 
     // POST: BurgersController/Edit/5
     [HttpPost("Burgers/{burgerId}/Ingredients/{id}/Edit")]
+    [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> EditIngredient(int burgerId, int id, [Bind("Id,Name,KCal,IsAllergen")] IngredientEditViewModel ingredientEditViewModel)
     {
@@ -292,6 +314,7 @@ public class BurgersController : Controller
     }
 
     [HttpGet("Burgers/{burgerId}/Ingredients/{id}/Delete")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteIngredient(int burgerId, int id)
     {
         var burger = await this.burgerService.GetBurgerAsync(burgerId);
@@ -312,9 +335,10 @@ public class BurgersController : Controller
         return this.View(ingredientEditViewModel);
     }
 
-    // POST: DrinksController/Delete/5
+    // POST: BurgersController/Delete/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteIngredientConfirmed(int burgerId, int id)
     {
         try

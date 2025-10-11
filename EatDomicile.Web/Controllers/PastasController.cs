@@ -1,6 +1,7 @@
-﻿using EatDomicile.Web.Services.Domains.Pastas.DTO;
-using EatDomicile.Web.Services.Interfaces;
-using EatDomicile.Web.ViewModels.Pastas;
+﻿using EatDomicile.Web.Services.Abstractions.Application;
+using EatDomicile.Web.Services.Dtos.Application.Pastas;
+using EatDomicile.Web.ViewsModels.Pastas;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 public class PastasController : Controller
@@ -13,21 +14,32 @@ public class PastasController : Controller
     }
 
     //GET PastasController
-    public async Task<IActionResult> Index()
+    [Authorize()]
+    public async Task<IActionResult> Index(int page = 1)
     {
-        var pastas = await this.pastasService.GetPastasAsync();
-        return View(pastas.Select(static pasta => new PastaViewModel()
+        var response = await this.pastasService.GetPastasAsync(page);
+        PastaListViewModel model = new PastaListViewModel()
         {
-            Id = pasta.Id,
-            Name = pasta.Name,
-            Price = pasta.Price,
-            Vegetarian = pasta.Vegetarian,
-            KCal = pasta.KCal,
-            Type = pasta.Type,
-        }));
+            Items = response.Items.Select(pasta => new PastaViewModel()
+            {
+                Id = pasta.Id,
+                Name = pasta.Name,
+                Price = pasta.Price,
+                Vegetarian = pasta.Vegetarian,
+                KCal = pasta.KCal,
+                Type = pasta.Type,
+            }).ToList(),
+            currentPage = response.currentPage,
+            maxPage = response.maxPage,
+            nextPage = response.nextPage,
+            previousPage = response.previousPage
+        };
+
+        return View(model);
     }
 
     //GET PastasController/Details/id
+    [Authorize()]
     public async Task<IActionResult> Details(int id)
     {
         try
@@ -56,6 +68,7 @@ public class PastasController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public IActionResult Create()
     {
         var pastaCreateViewModel = new PastaCreateViewModel();
@@ -65,6 +78,7 @@ public class PastasController : Controller
     // POST: PastasController/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Create([Bind("Name,Price,Type,KCal,Vegetarian")] PastaCreateViewModel pastaCreateViewModel)
     {
         if (!this.ModelState.IsValid)
@@ -91,6 +105,7 @@ public class PastasController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Edit(int id)
     {
         try
@@ -124,6 +139,7 @@ public class PastasController : Controller
     // POST: PastasController/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Edit(int id, [Bind("Id,Name,Price,Type,KCal,Vegetarian")] PastaEditViewModel pastaEditViewModel)
     {
         if (!this.ModelState.IsValid)
@@ -152,6 +168,7 @@ public class PastasController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Delete(int id)
     {
         try
@@ -185,6 +202,7 @@ public class PastasController : Controller
     // POST: PastasController/Delete/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteConfirmed(int id)
     {
         try

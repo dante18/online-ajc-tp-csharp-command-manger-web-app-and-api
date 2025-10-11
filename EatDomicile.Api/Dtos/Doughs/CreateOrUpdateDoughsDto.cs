@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace EatDomicile.Api.Dtos.Dough;
+namespace EatDomicile.Api.Dtos.Doughs;
 
 public class CreateOrUpdateDoughsDto
 {

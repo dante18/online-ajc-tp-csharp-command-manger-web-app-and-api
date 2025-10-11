@@ -1,4 +1,5 @@
-﻿@model IEnumerable<EatDomicile.Web.ViewModels.Orders.OrderViewModel>
+﻿@using EatDomicile.Web.ViewsModels.Orders
+@model OrderListViewModel
 
 @{
     ViewData["Title"] = "Commandes";
@@ -27,29 +28,76 @@
     <div class="col-12 table-responsive mt-3">
         <table class="table table-bordered table-striped">
             <thead>
-                <tr>
-                    <th class="text-center">Date de la commande</th>
-                    <th class="text-center">Date de livraison</th>
-                    <th class="text-center">Status de la commande</th>
-                    <th class="text-center">Propriétaire de la commande</th>
-                </tr>
+            <tr>
+                <th class="text-center">Date de la commande</th>
+                <th class="text-center">Date de livraison</th>
+                <th class="text-center">Status de la commande</th>
+                <th class="text-center">Propriétaire de la commande</th>
+            </tr>
             </thead>
             <tbody>
-                @foreach (var order in Model)
-                {
-                    <tr>
-                        <td class="text-center">@(order.OrderDate)</td>
-                        <td class="text-center">@(order.DeliveryDate == null ? "Inconnu" : order.DeliveryDate)</td>
-                        <td class="text-center">@(order.Status == 2 ? "Livrée" : "En cours")</td>
-                        <td class="text-center">@(order.User.FirstName.ToUpper()) @(order.User.LastName)</td>
-                        <td class="text-center">
-                            <a asp-action="Details" asp-route-id="@order.Id" class="btn btn-info">Détail</a>
+            @foreach (var order in Model.Items)
+            {
+                <tr>
+                    <td class="text-center">@(order.OrderDate)</td>
+                    <td class="text-center">@(order.DeliveryDate == null ? "Inconnu" : order.DeliveryDate)</td>
+                    <td class="text-center">@(order.Status == 2 ? "Livrée" : "En cours")</td>
+                    <td class="text-center">@(order.User.FirstName.ToUpper()) @(order.User.LastName)</td>
+                    <td class="text-center">
+                        <a asp-action="Details" asp-route-id="@order.Id" class="btn btn-info">Détail</a>
+                        @if (User.IsInRole("Admin"))
+                        {
                             <a asp-action="Edit" asp-route-id="@order.Id" class="btn btn-warning">Modifier</a>
                             <a asp-action="Delete" asp-route-id="@order.Id" class="btn btn-danger">Supprimer</a>
-                        </td>
-                    </tr>
-                }
+                        }
+                    </td>
+                </tr>
+            }
             </tbody>
         </table>
     </div>
 </div>
+@if (Model.maxPage > 1)
+{
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                    @if (Model.currentPage == 1)
+                    {
+                        <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="@(Model.previousPage)">Précédent</a>
+                        </li>
+                    }
+                    @foreach (var i in Enumerable.Range(1, Model.maxPage))
+                    {
+                        if (i == Model.currentPage)
+                        {
+                            <li class="page-item active"><span class="page-link">@i</span></li>
+                        }
+                        else
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+                            </li>
+                        }
+                    }
+                    @if (Model.currentPage == Model.maxPage)
+                    {
+                        <li class="page-item disabled"><span class="page-link">Next</span></li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="@(Model.nextPage)">Next</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    </div>
+}

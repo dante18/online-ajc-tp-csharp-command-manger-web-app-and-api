@@ -1,8 +1,9 @@
-﻿using EatDomicile.Web.Services.Domains.Addresses.DTO;
-using EatDomicile.Web.Services.Domains.Orders.DTO;
-using EatDomicile.Web.Services.Domains.Users.DTO;
-using EatDomicile.Web.Services.Interfaces;
-using EatDomicile.Web.ViewModels.Orders;
+﻿using EatDomicile.Web.Services.Abstractions.Application;
+using EatDomicile.Web.Services.Dtos.Application.Addresses;
+using EatDomicile.Web.Services.Dtos.Application.Orders;
+using EatDomicile.Web.Services.Dtos.Application.Users;
+using EatDomicile.Web.ViewsModels.Orders;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -25,36 +26,47 @@ public class OrdersController : Controller
 
 
     // GET: OrdersController
-    public async Task<IActionResult> Index()
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Index(int page = 1)
     {
-        var orders = await this.orderService.GetOrdersAsync();
-        return View(orders.Select(static order => new OrderViewModel()
+        var response = await this.orderService.GetOrdersAsync(page);
+        OrderListViewModel model = new OrderListViewModel()
         {
-            Id = order.Id,
-            OrderDate = order.OrderDate,
-            DeliveryDate = order.DeliveryDate,
-            Status = order.Status,
-            User = new UserDTO()
+            Items = response.Items.Select(order => new OrderViewModel()
             {
-                Id = order.User.Id,
-                FirstName = order.User.FirstName,
-                LastName = order.User.LastName,
-                Mail = order.User.Mail,
-                Phone = order.User.Phone,
-                Address = new AddressDTO()
+                Id = order.Id,
+                OrderDate = order.OrderDate,
+                DeliveryDate = order.DeliveryDate,
+                Status = order.Status,
+                User = new UserDTO()
                 {
-                    Id = order.User.Address.Id,
-                    Street = order.User.Address.Street,
-                    City = order.User.Address.City,
-                    State = order.User.Address.State,
-                    Zip = order.User.Address.Zip,
-                    Country = order.User.Address.Country,
-                }
-            },
-        }));
+                    Id = order.User.Id,
+                    FirstName = order.User.FirstName,
+                    LastName = order.User.LastName,
+                    Mail = order.User.Mail,
+                    Phone = order.User.Phone,
+                    Address = new AddressDTO()
+                    {
+                        Id = order.User.Address.Id,
+                        Street = order.User.Address.Street,
+                        City = order.User.Address.City,
+                        State = order.User.Address.State,
+                        Zip = order.User.Address.Zip,
+                        Country = order.User.Address.Country,
+                    }
+                },
+            }).ToList(),
+            currentPage = response.currentPage,
+            maxPage = response.maxPage,
+            nextPage = response.nextPage,
+            previousPage = response.previousPage
+        };
+
+        return View(model);
     }
 
     // GET: OrdersController/Details/5
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Details(int id)
     {
         try
@@ -106,10 +118,11 @@ public class OrdersController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
 
     public async Task<IActionResult> Create()
     {
-        var users = await this.usersService.GetUsersAsync();
+        var users = await this.orderService.GetOrderClientsAsync();
         var orderCreateViewModel = new OrderCreateViewModel()
         {
             UserList = users.Select(user => new SelectListItem($"{user.FirstName.ToUpper()} {user.LastName}", user.Id.ToString())).ToList()
@@ -120,6 +133,7 @@ public class OrdersController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Create([Bind("OrderDate,DeliveryDate,UserId,Status")] OrderCreateViewModel orderCreateViewModel)
     {
         if (!this.ModelState.IsValid)
@@ -146,6 +160,7 @@ public class OrdersController : Controller
     }
 
 
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Edit(int id)
     {
         try
@@ -157,7 +172,7 @@ public class OrdersController : Controller
                 return this.NotFound();
             }
 
-            var users = await this.usersService.GetUsersAsync();
+            var users = await this.orderService.GetOrderClientsAsync();
 
             var orderEditViewModel = new OrderEditViewModel
             {
@@ -181,6 +196,7 @@ public class OrdersController : Controller
     // POST: OrdersController/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Edit(int id, [Bind("Id,OrderDate,DeliveryDate,UserId,Status")] OrderEditViewModel orderEditViewModel)
     {
         if (!this.ModelState.IsValid)
@@ -207,6 +223,7 @@ public class OrdersController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Delete(int id)
     {
         try
@@ -261,6 +278,7 @@ public class OrdersController : Controller
     // POST: DrinksController/Delete/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteConfirmed(int id)
     {
         try
@@ -277,6 +295,7 @@ public class OrdersController : Controller
 
 
     [HttpGet("Orders/{id}/Products/Add")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AddProduct(int id)
     {
         var products = await this.productService.GetProductsAsync();
@@ -294,6 +313,7 @@ public class OrdersController : Controller
     // POST: OrdersController/Edit/5
     [HttpPost("Orders/{id}/Products/Add")]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> AddProduct(int id, [Bind("ProductId")] OrderProductAddViewModel orderProductAddViewModel)
     {
         if (!this.ModelState.IsValid)
@@ -313,6 +333,7 @@ public class OrdersController : Controller
     }
 
     [HttpGet("Orders/{orderId}/Products/{id}/Delete")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteProduct(int orderId, int id)
     {
         var order = await this.orderService.GetOrderAsync(orderId);
@@ -336,6 +357,7 @@ public class OrdersController : Controller
     // POST: DrinksController/Delete/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteProductConfirmed(int orderId, int id)
     {
         try
