@@ -1,0 +1,24 @@
+name: .NET
+
+on:
+  pull_request:
+    branches: [ "main", "dev" ]
+
+env:
+  PROJECT_NAME: '**/*.csproj'
+  DOTNET_VERSION: '9.0.x'
+  BUILD_CONFIGURATION: 'Release'
+
+jobs:
+  dotnet:
+    name: Install Framework
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
