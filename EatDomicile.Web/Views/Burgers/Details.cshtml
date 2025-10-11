@@ -1,4 +1,5 @@
-﻿@model EatDomicile.Web.ViewModels.Burgers.BurgerDetailsViewModel
+﻿@using EatDomicile.Web.ViewsModels.Burgers
+@model BurgerDetailsViewModel
 
 @{
     ViewData["Title"] = "Détail burger";
@@ -10,7 +11,10 @@
     </div>
     <div class="col-6 d-flex align-items-center justify-content-end">
         <a asp-action="Index" class="btn btn-primary">Retourner sur la liste des burgers</a>
-        <a asp-action="Edit" asp-route-id="@(Model.Burger.Id) " class="btn btn-warning ms-2">Modifier le burger</a>
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Edit" asp-route-id="@(Model.Burger.Id) " class="btn btn-warning ms-2">Modifier le burger</a>
+        }
     </div>
 </div>
 <div class="row">
@@ -34,47 +38,66 @@
             <dd class="col-sm-8">
                 @(Model.Burger.Vegetarian ? "Végétarien" : "Non végétarien")
             </dd>
+            @if (User.IsInRole("User"))
+            {
+                <dt class="col-sm-4">
+                    Ingredients
+                </dt>
+                <dd class="col-sm-8">
+                    <ul>
+                        @foreach (var ingredient in Model.Ingredients)
+                        {
+                            <li>
+                                Name: @ingredient.Name - Allergène: @(ingredient.IsAllergen ? "Oui" : "Non") - KCal: @ingredient.KCal
+                            </li>
+                        }
+                    </ul>
+                </dd>
+            }
         </dl>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-6 d-flex align-items-center justify-content-start mt-3">
-        <h1>Liste des ingredients</h1>
+@if (User.IsInRole("Admin"))
+{
+    <div class="row">
+        <div class="col-6 d-flex align-items-center justify-content-start mt-3">
+            <h1>Liste des ingredients</h1>
+        </div>
+        <div class="col-6 d-flex align-items-center justify-content-end">
+            <a asp-action="AddIngredient" asp-route-id="@(Model.Burger.Id) " class="btn btn-warning ms-2">Ajouter un ingrédient</a>
+        </div>
     </div>
-    <div class="col-6 d-flex align-items-center justify-content-end">
-        <a asp-action="AddIngredient" asp-route-id="@(Model.Burger.Id) " class="btn btn-warning ms-2">Ajouter un ingrédient</a>
-    </div>
-</div>
-<div class="row">
-    <div class="col-12 table-responsive mt-3">
-        <table class="table table-bordered table-striped">
-            <thead>
-            <tr>
-                <th class="text-center">Nom</th>
-                <th class="text-center">Allergène</th>
-                <th class="text-center">KCal</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var ingredient in Model.Ingredients)
-            {
+    <div class="row">
+        <div class="col-12 table-responsive mt-3">
+            <table class="table table-bordered table-striped">
+                <thead>
                 <tr>
-                    <td class="text-center">@ingredient.Name</td>
+                    <th class="text-center">Nom</th>
+                    <th class="text-center">Allergène</th>
+                    <th class="text-center">KCal</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var ingredient in Model.Ingredients)
+                {
+                    <tr>
+                        <td class="text-center">@ingredient.Name</td>
                         <td class="text-center">@(ingredient.IsAllergen ? "Oui" : "Non")</td>
-                    <td class="text-center">@ingredient.KCal</td>
-                    <td class="text-center">
-                        <a asp-action="EditIngredient" 
-                           asp-route-id="@ingredient.Id" 
-                           asp-route-burgerId="@this.Model.Burger.Id"
-                           class="btn btn-warning"
-                        >Modifier</a>
+                        <td class="text-center">@ingredient.KCal</td>
+                        <td class="text-center">
+                            <a asp-action="EditIngredient" 
+                               asp-route-id="@ingredient.Id" 
+                               asp-route-burgerId="@this.Model.Burger.Id"
+                               class="btn btn-warning"
+                            >Modifier</a>
                             <a asp-action="DeleteIngredient" asp-route-id="@ingredient.Id" 
                                asp-route-burgerId="@this.Model.Burger.Id" class="btn btn-danger">Supprimer</a>
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
+}

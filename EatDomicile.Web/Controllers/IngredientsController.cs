@@ -1,6 +1,7 @@
-﻿using EatDomicile.Web.Services.Domains.Ingredients.DTO;
-using EatDomicile.Web.Services.Interfaces;
-using EatDomicile.Web.ViewModels.Ingredients;
+﻿using EatDomicile.Web.Services.Abstractions.Application;
+using EatDomicile.Web.Services.Dtos.Application.Ingredients;
+using EatDomicile.Web.ViewsModels.Ingredients;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EatDomicile.Web.Controllers;
@@ -15,19 +16,30 @@ public class IngredientsController : Controller
     }
 
     // GET: IngredientsController
-    public async Task<IActionResult> Index()
+    [Authorize()]
+    public async Task<IActionResult> Index(int page = 1)
     {
-        var ingredients = await this.ingredientService.GetIngredientsAsync();
-        return View(ingredients.Select(static ingredient => new IngredientViewModel()
+        var response = await this.ingredientService.GetIngredientsAsync(page);
+        IngredientListViewModel model = new IngredientListViewModel()
         {
-            Id = ingredient.Id,
-            Name = ingredient.Name,
-            KCal = ingredient.KCal,
-            IsAllergen = ingredient.IsAllergen
-        }));
+            Items = response.Items.Select(ingredient => new IngredientViewModel()
+            {
+                Id = ingredient.Id,
+                Name = ingredient.Name,
+                KCal = ingredient.KCal,
+                IsAllergen = ingredient.IsAllergen
+            }).ToList(),
+            currentPage = response.currentPage,
+            maxPage = response.maxPage,
+            nextPage = response.nextPage,
+            previousPage = response.previousPage
+        };
+
+        return View(model);
     }
 
     // GET: IngredientsController/Details/5
+    [Authorize()]
     public async Task<IActionResult> Details(int id)
     {
         try
@@ -54,6 +66,7 @@ public class IngredientsController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public IActionResult Create()
     {
         var ingredientCreateViewModel = new IngredientCreateViewModel();
@@ -63,6 +76,7 @@ public class IngredientsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Create([Bind("Name,KCal,IsAllergen")] IngredientCreateViewModel ingredientCreateViewModel)
     {
         if (!this.ModelState.IsValid)
@@ -87,6 +101,7 @@ public class IngredientsController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Edit(int id)
     {
         try
@@ -118,6 +133,7 @@ public class IngredientsController : Controller
     // POST: IngredientsController/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Edit(int id, [Bind("Id,Name,KCal,IsAllergen")] IngredientEditViewModel ingredientEditViewModel)
     {
         if (!this.ModelState.IsValid)
@@ -144,6 +160,7 @@ public class IngredientsController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Delete(int id)
     {
         try
@@ -175,6 +192,7 @@ public class IngredientsController : Controller
     // POST: DrinksController/Delete/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteConfirmed(int id)
     {
         try
