@@ -24,7 +24,7 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore dependencies
-        run: dotnet restore EatDomicile.Api/EatDomicile.Api.csproj && dotnet restore EatDomicile.Api/EatDomicile.Core.csproj
+        run: dotnet restore EatDomicile.Api/EatDomicile.Api.csproj && dotnet restore EatDomicile.Core/EatDomicile.Core.csproj
 
       - name: Build project
         run: dotnet build EatDomicile.Api/EatDomicile.Api.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
