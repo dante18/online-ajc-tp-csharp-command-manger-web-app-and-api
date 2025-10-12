@@ -5,26 +5,45 @@ on:
     branches: [ "main", "dev" ]
 
 env:
-  PROJECT_NAME: '**/*.csproj'
+  PROJECT_WEB: 'EatDomicile.Web.Services/EatDomicile.Web.Services.csproj EatDomicile.Web/EatDomicile.Web.csproj'
   DOTNET_VERSION: '9.0.x'
   BUILD_CONFIGURATION: 'Release'
 
 jobs:
-  build:
-    name: Build sur Ubuntu
+  api:
+    name: Build API
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: Install .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore dependencies
-        run: dotnet restore ${{ env.PROJECT_NAME }}
+        run: dotnet restore EatDomicile.Api/EatDomicile.Api.csproj && dotnet restore EatDomicile.Api/EatDomicile.Core.csproj
 
       - name: Build project
-        run: dotnet build ${{ env.PROJECT_NAME }} --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
+        run: dotnet build EatDomicile.Api/EatDomicile.Api.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
+        
+  web:
+    name: Build Web
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore EatDomicile.Web.Services/EatDomicile.Web.Services.csproj && dotnet restore EatDomicile.Web/EatDomicile.Web.csproj
+
+      - name: Build project
+        run: dotnet build EatDomicile.Web.Services/EatDomicile.Web --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
