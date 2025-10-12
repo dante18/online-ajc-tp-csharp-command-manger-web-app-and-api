@@ -1,12 +1,13 @@
 using EatDomicile.Web.Models;
-using EatDomicile.Web.Services.Interfaces;
-using EatDomicile.Web.ViewModels.Pizzas;
+using EatDomicile.Web.Services.Abstractions.Application;
+using EatDomicile.Web.ViewsModels.Stats;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using EatDomicile.Web.ViewModels.Stats;
 
 namespace EatDomicile.web.Controllers;
 
+[Authorize]
 public class HomeController : Controller
 {
     private readonly IApiStatisticsService statisticsService;

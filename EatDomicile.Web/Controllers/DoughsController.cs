@@ -1,6 +1,7 @@
-﻿using EatDomicile.Web.Services.Domains.Doughs.DTO;
-using EatDomicile.Web.Services.Interfaces;
-using EatDomicile.Web.ViewModels.Doughs;
+﻿using EatDomicile.Web.Services.Abstractions.Application;
+using EatDomicile.Web.Services.Dtos.Application.Doughs;
+using EatDomicile.Web.ViewsModels.Doughs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EatDomicile.Web.Controllers;
@@ -15,17 +16,28 @@ public class DoughsController : Controller
     }
 
     //GET DoughsController
-    public async Task<IActionResult> Index()
+    [Authorize()]
+    public async Task<IActionResult> Index(int page = 1)
     {
-        var doughs = await this.doughsService.GetDoughsAsync();
-        return View(doughs.Select(static dough => new DoughViewModel()
+        var response = await this.doughsService.GetDoughsAsync(page);
+        DoughListViewModel model = new DoughListViewModel()
         {
-            Id = dough.Id,
-            Name = dough.Name
-        }));
+            Items = response.Items.Select(dough => new DoughViewModel()
+            {
+                Id = dough.Id,
+                Name = dough.Name
+            }).ToList(),
+            currentPage = response.currentPage,
+            maxPage = response.maxPage,
+            nextPage = response.nextPage,
+            previousPage = response.previousPage
+        };
+
+        return View(model);
     }
 
     //GET DoughsController/Details/id
+    [Authorize()]
     public async Task<IActionResult> Details(int id)
     {
         try
@@ -50,6 +62,7 @@ public class DoughsController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public IActionResult Create()
     {
         var doughCreateViewModel = new DoughCreateViewModel();
@@ -59,6 +72,7 @@ public class DoughsController : Controller
     // POST: DoughsController/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Create([Bind("Name")] DoughCreateViewModel doughCreateViewModel)
     {
         if (!this.ModelState.IsValid)
@@ -81,6 +95,7 @@ public class DoughsController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Edit(int id)
     {
         try
@@ -110,6 +125,7 @@ public class DoughsController : Controller
     // POST: DoughsController/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Edit(int id, [Bind("Id,Name,Price,Fizzy,KCal")] DoughEditViewModel doughEditViewModel)
     {
         if (!this.ModelState.IsValid)
@@ -134,6 +150,7 @@ public class DoughsController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Delete(int id)
     {
         try
@@ -163,6 +180,7 @@ public class DoughsController : Controller
     // POST: DoughsController/Delete/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteConfirmed(int id)
     {
         try

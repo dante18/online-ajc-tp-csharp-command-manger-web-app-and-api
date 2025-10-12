@@ -1,4 +1,4 @@
-﻿using EatDomicile.Api.Dtos.Dough;
+﻿using EatDomicile.Api.Dtos.Doughs;
 
 namespace EatDomicile.Api.Dtos.Pizza;
 

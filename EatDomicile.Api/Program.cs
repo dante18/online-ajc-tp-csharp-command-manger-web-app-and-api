@@ -1,48 +1,83 @@
+using Microsoft.AspNetCore.Identity;
+using EatDomicile.Api.Extensions;
 using EatDomicile.Core.Context;
 using EatDomicile.Core.Seeders;
-using EatDomicile.Core.Services;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Configure logging
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
 
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Add services to the container
+builder.Services.AddApplicationCoreService(builder.Configuration);
+builder.Services.AddApplicationApiService();
+builder.Services.AddApplicationApiSecurityServices(builder.Configuration);
+builder.Services.AddApplicationApiInfrastructureServices();
 
-builder.Services.AddDbContext<CommandStoreContext>(options => options.UseSqlServer());
-builder.Services.AddTransient<BurgerService>();
-builder.Services.AddTransient<DoughsService>();
-builder.Services.AddTransient<DrinkService>();
-builder.Services.AddTransient<FoodService>();
-builder.Services.AddTransient<IngredientService>();
-builder.Services.AddTransient<OrderService>();
-builder.Services.AddTransient<PastaService>();
-builder.Services.AddTransient<PizzaService>();
-builder.Services.AddTransient<ProductService>();
-builder.Services.AddTransient<UserService>();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// Authentication (JWT)
+builder.AddJwtAuthentication();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.MapOpenApi();
+// Initialize database
+using var scope = app.Services.CreateScope();
 
-    using var scope = app.Services.CreateScope();
-    var context = scope.ServiceProvider.GetRequiredService<CommandStoreContext>(); 
-    DatabaseSeeder.SeedDevData(context);
+try
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationStoreContext>();
+    await context.Database.EnsureCreatedAsync();
+
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    logger.LogInformation("Database initialized successfully.");
+}
+catch (Exception ex)
+{
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "An error occurred while creating the database.");
+    throw;
 }
 
+// Configure the HTTP request pipeline
+if (app.Environment.IsDevelopment())
+{
+    var contextIdentity = scope.ServiceProvider.GetRequiredService<IdentityContext>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    await DatabaseIdentitySeeder.SeedDevDataAsync(contextIdentity, userManager, roleManager);
+
+    var contextApplication = scope.ServiceProvider.GetRequiredService<ApplicationStoreContext>();
+    await DatabaseApplicationSeeder.SeedDevDataAsync(contextApplication, userManager, roleManager);
+
+    app.UseDeveloperExceptionPage();
+    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+else
+{
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
+}
+
+// Security headers
 app.UseHttpsRedirection();
 
+// Response compression (early in pipeline)
+app.UseResponseCompression();
+
+// CORS (before authentication)
+app.UseCors();
+
+// Authentication & Authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
+// Response caching
+app.UseResponseCaching();
+
+// API endpoints
 app.MapControllers();
 
 app.Run();

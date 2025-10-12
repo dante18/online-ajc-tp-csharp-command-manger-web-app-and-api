@@ -1,7 +1,10 @@
 ﻿using EatDomicile.Api.Dtos.Burger;
+using EatDomicile.Api.Dtos.Common;
 using EatDomicile.Api.Dtos.Ingredient;
+using EatDomicile.Core.Abstractions.Application;
 using EatDomicile.Core.Entities;
-using EatDomicile.Core.Services;
+using EatDomicile.Core.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EatDomicile.Api.Controllers;
@@ -10,175 +13,420 @@ namespace EatDomicile.Api.Controllers;
 [Route("api/[controller]")]
 public class BurgersController : Controller
 {
-    private readonly BurgerService burgerService;
+    private readonly ILogger<BurgersController> logger;
 
-    private readonly IngredientService ingredientService;
+    private readonly IBurgerService burgerService;
 
-    public BurgersController(BurgerService burgerService, IngredientService ingredientService)
+    private readonly IIngredientService ingredientService;
+
+    public BurgersController(ILogger<BurgersController> logger, IBurgerService burgerService, IIngredientService ingredientService)
     {
+        this.logger = logger;
         this.burgerService = burgerService;
         this.ingredientService = ingredientService;
+        this.logger.LogInformation("BurgersController initialized");
     }
 
     [HttpGet]
-    public IResult GetBurgers()
+    [AllowAnonymous]
+    public async Task<IResult> GetBurgers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
-        List<BurgerDto> burgers = this.burgerService.GetAllBurgers().Select(b => new BurgerDto()
-        {
-            Id = b.Id,
-            Vegetarian = b.Vegetarian,
-            Name = b.Name,
-            Price = b.Price
-        }).ToList();
+        this.logger.LogInformation("GetBurgers called");
 
-        return Results.Ok(burgers);
+        try
+        {
+            var queryResult = this.burgerService.GetAllBurgers();
+            var queryResultWithPagination = await queryResult.ToPagedResultAsync(pageNumber, pageSize);
+
+            List<BurgerDto> burgers = queryResultWithPagination.Items.Select(b => new BurgerDto()
+            {
+                Id = b.Id,
+                Vegetarian = b.Vegetarian,
+                Name = b.Name,
+                Price = b.Price
+            }).ToList();
+
+            PaginatedResponse<BurgerDto> response = new PaginatedResponse<BurgerDto>()
+            {
+                Items = burgers,
+                currentPage = pageNumber,
+                maxPage = queryResultWithPagination.TotalPages,
+                nextPage = pageNumber == queryResultWithPagination.TotalPages
+                    ? queryResultWithPagination.TotalPages
+                    : (pageNumber + 1),
+                previousPage = pageNumber == 1 ? 1 : (pageNumber - 1)
+            };
+
+            this.logger.LogInformation("GetBurgers completed successfully. Found {BurgerCount} burgers", burgers.Count);
+
+            return Results.Ok(response);
+        }
+        catch (Exception e)
+        {
+            this.logger.LogError(e, "An error occurred while fetching burgers");
+
+            return Results.InternalServerError();
+        }
     }
 
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public IResult GetBurger([FromRoute] int id)
     {
-        Burger burger = this.burgerService.GetBurger(id);
-        if (burger is null)
-            return Results.NotFound($"Burger not found by id : {id}");
+        this.logger.LogInformation("GetBurger called with ID: {BurgerId}", id);
 
-        BurgerDto burgerDto = new BurgerDto()
+        try
         {
-            Id = burger.Id,
-            Vegetarian = burger.Vegetarian,
-            Name = burger.Name,
-            Price = burger.Price
-        };
+            Burger burger = this.burgerService.GetBurger(id);
 
-        return Results.Ok(burgerDto);
+            if (burger is null)
+            {
+                this.logger.LogWarning("Burger not found with ID: {BurgerId}", id);
+                return Results.NotFound($"Burger not found by id : {id}");
+            }
+
+            this.logger.LogInformation("GetBurger completed successfully for ID: {BurgerId}, Name: {BurgerName}",
+                id,
+                burger.Name);
+
+            BurgerDto burgerDto = new BurgerDto()
+            {
+                Id = burger.Id,
+                Vegetarian = burger.Vegetarian,
+                Name = burger.Name,
+                Price = burger.Price
+            };
+
+            return Results.Ok(burgerDto);
+        }
+        catch (Exception e)
+        {
+            this.logger.LogError(e, "An error occurred while fetching burger with ID: {BurgerId}", id);
+            return Results.InternalServerError(e);
+        }
     }
 
     [HttpGet("{id}/ingredients")]
+    [AllowAnonymous]
     public IResult GetBurgerIngredients([FromRoute] int id)
     {
-        Burger burger = this.burgerService.GetBurger(id);
-        if (burger is null)
-            return Results.NotFound($"Burger not found by id : {id}");
+        this.logger.LogInformation("GetBurgerIngredients called with ID: {BurgerId}", id);
 
-        List<IngredientDto> ingredients = this.ingredientService.GetAllIngredientsByBurger(id)
-            .Select(i => new IngredientDto()
+        try
+        {
+            Burger burger = this.burgerService.GetBurger(id);
+
+            if (burger is null)
             {
-                Id = i.Id,
-                Name = i.Name,
-                KCal = i.KCal,
-                IsAllergen = i.IsAllergen
-            }).ToList();
+                this.logger.LogWarning("Burger not found with ID: {BurgerId}", id);
+                return Results.NotFound($"Burger not found by id : {id}");
+            }
 
-        return Results.Ok(ingredients);
+            this.logger.LogInformation("GetBurgerIngredients completed successfully for ID: {BurgerId}, Name: {BurgerName}",
+                id,
+                burger.Name);
+
+            List<IngredientDto> ingredients = this.ingredientService.GetAllIngredientsByBurger(id)
+                .Select(i => new IngredientDto()
+                {
+                    Id = i.Id,
+                    Name = i.Name,
+                    KCal = i.KCal,
+                    IsAllergen = i.IsAllergen
+                }).ToList();
+
+            return Results.Ok(ingredients);
+        }
+        catch (Exception e)
+        {
+            this.logger.LogError(e, "An error occurred while fetching ingredients burger with ID: {BurgerId}", id);
+            return Results.InternalServerError(e);
+        }
     }
 
     [HttpPost()]
+    [Authorize(Roles = "Admin")]
     public IResult CreateBurger([FromBody] CreateOrUpdateBurgerDto dto)
     {
+        this.logger.LogInformation("CreateBurger called with Name: {Name}, Price: {Price}, Vegetarian: {Vegetarian}",
+            dto.Name,
+            dto.Price,
+            dto.Vegetarian);
+
         if (!ModelState.IsValid)
             return Results.BadRequest(ModelState);
 
-        Burger burger = new Burger()
+        try
         {
-            Name = dto.Name,
-            Price = dto.Price,
-            Vegetarian = dto.Vegetarian
+            Burger burger = new Burger()
+            {
+                Name = dto.Name,
+                Price = dto.Price,
+                Vegetarian = dto.Vegetarian
 
-        };
+            };
 
-        this.burgerService.CreateBurger(burger);
+            this.logger.LogDebug("Adding new burger to context: {BurgerDetails}",
+                new
+                {
+                    dto.Name,
+                    dto.Price,
+                    dto.Vegetarian
+                }
+            );
 
-        BurgerDto burgerDto = new BurgerDto()
+            this.burgerService.CreateBurger(burger);
+
+            this.logger.LogInformation("CreateBurger completed successfully. New burger ID: {BurgerId}, Name: {Name}",
+                burger.Id,
+                burger.Name);
+
+            BurgerDto burgerDto = new BurgerDto()
+            {
+                Id = burger.Id,
+                Vegetarian = burger.Vegetarian,
+                Name = burger.Name,
+                Price = burger.Price
+            };
+
+            return Results.Created($"/api/burgers/{burger.Id}", burgerDto);
+        }
+        catch (Exception e)
         {
-            Id = burger.Id,
-            Vegetarian = burger.Vegetarian,
-            Name = burger.Name,
-            Price = burger.Price
-        };
+            this.logger.LogError(e,
+                "An error occurred while creating burger with Name: {Name}",
+                dto.Name);
 
-        return Results.Created($"/api/burgers/{burger.Id}", burgerDto);
+            return Results.InternalServerError(e);
+        }
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
     public IResult UpdateBurger([FromRoute] int id, [FromBody] CreateOrUpdateBurgerDto dto)
     {
-        Burger burger = this.burgerService.GetBurger(id);
-        if (burger is null)
-            return Results.NotFound($"Burger not found by id : {id}");
+        this.logger.LogInformation("UpdateBurger called for ID: {BurgerId} with data: {UpdateData}",
+            id,
+            new
+            {
+                dto.Name,
+                dto.Price,
+                dto.Vegetarian
+            });
 
-        if (dto.Name != null) burger.Name = dto.Name;
-        if (dto.Price != null) burger.Price = dto.Price;
-        if (dto.Vegetarian != null) burger.Vegetarian = dto.Vegetarian;
+        if (!ModelState.IsValid)
+            return Results.BadRequest(ModelState);
 
-        this.burgerService.UpdateBurger(burger);
+        try
+        {
+            Burger burger = this.burgerService.GetBurger(id);
 
-        return Results.NoContent();
+            if (burger is null)
+            {
+                this.logger.LogWarning("Cannot update burger - not found with ID: {BurgerId}", id);
+                return Results.NotFound($"Burger not found by id : {id}");
+            }
+
+            this.logger.LogDebug("Found existing burger: {BurgerName}",
+                burger.Name);
+
+            if (dto.Name != null) burger.Name = dto.Name;
+            if (dto.Price != null) burger.Price = dto.Price;
+            if (dto.Vegetarian != null) burger.Vegetarian = dto.Vegetarian;
+
+            this.burgerService.UpdateBurger(burger);
+
+            this.logger.LogInformation("UpdateBurger completed successfully for ID: {BurgerId}", id);
+
+            return Results.NoContent();
+        }
+        catch (Exception e)
+        {
+            this.logger.LogError(e, "An error occurred while updating burger with ID: {BurgerId}", id);
+            return Results.InternalServerError(e);
+        }
     }
 
     [HttpPost("{id}/ingredients")]
+    [Authorize(Roles = "Admin")]
     public IResult UpdateBurgerAddIngredient([FromRoute] int id, [FromBody] CreateOrUpdateIngredientDto dto)
     {
-        Burger burger = this.burgerService.GetBurger(id);
-        if (burger is null)
-            return Results.NotFound($"Burger not found by id : {id}");
+        this.logger.LogInformation("UpdateBurgerAddIngredient called for ID: {BurgerId} with data: {UpdateData}",
+            id,
+            new
+            {
+                dto.Name,
+                dto.KCal,
+                dto.IsAllergen,
+                BurgerId = id
+            });
 
-        Ingredient ingredient = new Ingredient()
+        if (!ModelState.IsValid)
+            return Results.BadRequest(ModelState);
+
+        try
         {
-            Name = dto.Name,
-            KCal = dto.KCal,
-            IsAllergen = dto.IsAllergen,
-            BurgerId = id
-        };
+            Burger burger = this.burgerService.GetBurger(id);
 
-        this.ingredientService.CreateIngredient(ingredient);
+            if (burger is null)
+            {
+                this.logger.LogWarning("Cannot add ingredient - burger not found with ID: {BurgerId}", id);
+                return Results.NotFound($"Burger not found by id : {id}");
+            }
 
-        return Results.NoContent();
+            this.logger.LogDebug("Found existing burger: {BurgerName}",
+                burger.Name);
+
+            Ingredient ingredient = new Ingredient()
+            {
+                Name = dto.Name,
+                KCal = dto.KCal,
+                IsAllergen = dto.IsAllergen,
+                BurgerId = id
+            };
+
+            this.ingredientService.CreateIngredient(ingredient);
+
+            this.logger.LogInformation("UpdateBurgerAddIngredient completed successfully for ID: {BurgerId}", id);
+
+            return Results.NoContent();
+        }
+        catch (Exception e)
+        {
+            this.logger.LogError(e, "An error occurred while adding ingredient to burger with ID: {BurgerId}", id);
+            return Results.InternalServerError(e);
+        }
     }
 
     [HttpPut("{id}/ingredients/{ingredientId}")]
+    [Authorize(Roles = "Admin")]
     public IResult UpdateBurgerUpdateIngredient([FromRoute] int id, [FromRoute] int ingredientId, [FromBody] CreateOrUpdateIngredientDto dto)
     {
-        Burger burger = this.burgerService.GetBurger(id);
-        if (burger is null)
-            return Results.NotFound($"Burger not found by id : {id}");
+        this.logger.LogInformation("UpdateBurgerUpdateIngredient called for ID: {BurgerId} with data: {UpdateData}",
+            id,
+            new
+            {
+                dto.Name,
+                dto.KCal,
+                dto.IsAllergen
+            });
 
-        Ingredient ingredient = this.ingredientService.GetIngredient(ingredientId);
-        if (ingredient is null)
-            return Results.NotFound($"Ingredient not found by id : {ingredientId}");
+        if (!ModelState.IsValid)
+            return Results.BadRequest(ModelState);
 
-        if (dto.Name != null) ingredient.Name = dto.Name;
-        if (dto.KCal != null) ingredient.KCal = dto.KCal;
-        if (dto.IsAllergen != null) ingredient.IsAllergen = dto.IsAllergen;
+        try
+        {
+            Burger burger = this.burgerService.GetBurger(id);
 
-        this.ingredientService.UpdateIngredient(ingredient);
+            if (burger is null)
+            {
+                this.logger.LogWarning("Cannot update ingredient - burger not found with ID: {BurgerId}", id);
+                return Results.NotFound($"Burger not found by id : {id}");
+            }
 
-        return Results.NoContent();
+            Ingredient ingredient = this.ingredientService.GetIngredient(ingredientId);
+
+            if (ingredient is null)
+            {
+                this.logger.LogWarning("Cannot update ingredient - not found with ID: {BurgeIngredientIdrId}", id);
+                return Results.NotFound($"Ingredient not found by id : {id}");
+            }
+
+            this.logger.LogDebug("Found existing burger: {BurgerName}",
+                burger.Name);
+
+            this.logger.LogDebug("Found existing ingredient: {IngredientName}",
+                ingredient.Name);
+
+            if (dto.Name != null) ingredient.Name = dto.Name;
+            if (dto.KCal != null) ingredient.KCal = dto.KCal;
+            if (dto.IsAllergen != null) ingredient.IsAllergen = dto.IsAllergen;
+
+            this.ingredientService.UpdateIngredient(ingredient);
+
+            this.logger.LogInformation("UpdateBurgerUpdateIngredient completed successfully for ID: {BurgerId}", id);
+
+            return Results.NoContent();
+        }
+        catch (Exception e)
+        {
+            this.logger.LogError(e, "An error occurred while updating ingredient to burger with ID: {BurgerId}", id);
+            return Results.InternalServerError(e);
+        }
     }
 
     [HttpDelete("{id}/ingredients/{ingredientId}")]
+    [Authorize(Roles = "Admin")]
     public IResult UpdateBurgerDeleteIngredient([FromRoute] int id, [FromRoute] int ingredientId)
     {
-        Burger burger = this.burgerService.GetBurger(id);
-        if (burger is null)
-            return Results.NotFound($"Burger not found by id : {id}");
+        this.logger.LogInformation("UpdateBurgerDeleteIngredient called for ID: {BurgerId}", id);
 
-        Ingredient ingredient = this.ingredientService.GetIngredient(ingredientId);
-        if (ingredient is null)
-            return Results.NotFound($"Ingredient not found by id : {ingredientId}");
+        try
+        {
+            Burger burger = this.burgerService.GetBurger(id);
 
-        this.ingredientService.DeleteIngredient(ingredient);
+            if (burger is null)
+            {
+                this.logger.LogWarning("Cannot delete ingredient - burger not found with ID: {BurgerId}", id);
+                return Results.NotFound($"Burger not found by id : {id}");
+            }
 
-        return Results.NoContent();
+            Ingredient ingredient = this.ingredientService.GetIngredient(ingredientId);
+
+            if (ingredient is null)
+            {
+                this.logger.LogWarning("Cannot delete ingredient - not found with ID: {IngredientId}", id);
+                return Results.NotFound($"Ingredient not found by id : {id}");
+            }
+
+            this.logger.LogDebug("Found existing burger: {BurgerName}",
+                burger.Name);
+
+            this.logger.LogDebug("Found existing ingredient: {IngredientName}",
+                ingredient.Name);
+
+            this.ingredientService.DeleteIngredient(ingredient);
+
+            this.logger.LogInformation("UpdateBurgerDeleteIngredient completed successfully for ID: {BurgerId}", id);
+
+            return Results.NoContent();
+        }
+        catch (Exception e)
+        {
+            this.logger.LogError(e, "An error occurred while deleting ingredient to burger with ID: {BurgerId}", id);
+            return Results.InternalServerError(e);
+        }
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IResult> DeleteBurger(int id)
     {
-        Burger burger = this.burgerService.GetBurger(id);
-        if (burger is null)
-            return Results.NotFound($"Burger not found by id : {id}");
+        this.logger.LogInformation("DeleteBurger called for ID: {BurgerId}", id);
 
-        this.burgerService.DeleteBurger(burger);
+        try
+        {
+            Burger burger = this.burgerService.GetBurger(id);
 
-        return Results.NoContent();
+            if (burger is null)
+            {
+                this.logger.LogWarning("Cannot delete burger - not found with ID: {BurgerId}", id);
+                return Results.NotFound($"Burger not found by id : {id}");
+            }
+
+            this.logger.LogInformation("Deleting burger: ID={BurgerId}, Name='{BurgerName}'",
+                burger.Id,
+                burger.Name);
+
+            this.burgerService.DeleteBurger(burger);
+
+            this.logger.LogInformation("DeleteBurger completed successfully for ID: {BurgerId}", id);
+            return Results.NoContent();
+        }
+        catch (Exception e)
+        {
+            this.logger.LogError(e, "An error occurred while deleting burger with ID: {BurgerId}", id);
+            return Results.InternalServerError(e);
+        }
     }
 }

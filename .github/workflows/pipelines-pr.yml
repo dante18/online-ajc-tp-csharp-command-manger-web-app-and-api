@@ -1,0 +1,50 @@
+name: Pipeline PR
+
+on:
+  pull_request:
+    branches: [ "main", "dev" ]
+
+env:
+  PROJECT_WEB: 'EatDomicile.Web.Services/EatDomicile.Web.Services.csproj EatDomicile.Web/EatDomicile.Web.csproj'
+  DOTNET_VERSION: '9.0.x'
+  BUILD_CONFIGURATION: 'Release'
+
+jobs:
+  api:
+    name: Build API
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore EatDomicile.Api/EatDomicile.Api.csproj && dotnet restore EatDomicile.Core/EatDomicile.Core.csproj
+
+      - name: Build project
+        run: dotnet build EatDomicile.Api/EatDomicile.Api.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
+        
+  web:
+    name: Build Web
+    runs-on: ubuntu-latest
+    needs: api
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore EatDomicile.Web.Services/EatDomicile.Web.Services.csproj && dotnet restore EatDomicile.Web/EatDomicile.Web.csproj
+
+      - name: Build project
+        run: dotnet build EatDomicile.Web/EatDomicile.Web.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore

@@ -1,9 +1,10 @@
-﻿using EatDomicile.Web.Services.Domains.Doughs.DTO;
-using EatDomicile.Web.Services.Domains.Ingredients.DTO;
-using EatDomicile.Web.Services.Domains.Pizzas.DTO;
-using EatDomicile.Web.Services.Interfaces;
-using EatDomicile.Web.ViewModels.Ingredients;
-using EatDomicile.Web.ViewModels.Pizzas;
+﻿using EatDomicile.Web.Services.Abstractions.Application;
+using EatDomicile.Web.Services.Dtos.Application.Doughs;
+using EatDomicile.Web.Services.Dtos.Application.Ingredients;
+using EatDomicile.Web.Services.Dtos.Application.Pizzas;
+using EatDomicile.Web.ViewsModels.Ingredients;
+using EatDomicile.Web.ViewsModels.Pizzas;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -25,20 +26,31 @@ public class PizzasController : Controller
     }
 
     // GET PizzasController
-    public async Task<IActionResult> Index()
+    [Authorize()]
+    public async Task<IActionResult> Index(int page = 1)
     {
-        var pizza = await this.pizzasService.GetPizzasAsync();
-        return View(pizza.Select(static pizza => new PizzaViewModel()
+        var response = await this.pizzasService.GetPizzasAsync(page);
+        PizzaListViewModel model = new PizzaListViewModel()
         {
-            Id = pizza.Id,
-            Name = pizza.Name,
-            Price = pizza.Price,
-            Doughs = pizza.Doughs,
-            Vegetarian = pizza.Vegetarian
-        }));
+            Items = response.Items.Select(pizza => new PizzaViewModel()
+            {
+                Id = pizza.Id,
+                Name = pizza.Name,
+                Price = pizza.Price,
+                Doughs = pizza.Doughs,
+                Vegetarian = pizza.Vegetarian
+            }).ToList(),
+            currentPage = response.currentPage,
+            maxPage = response.maxPage,
+            nextPage = response.nextPage,
+            previousPage = response.previousPage
+        };
+
+        return View(model);
     }
 
     // GET PizzasController/Details/5
+    [Authorize()]
     public async Task<IActionResult> Details(int id)
     {
         try
@@ -77,9 +89,10 @@ public class PizzasController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create()
     {
-        var doughs = await this.doughService.GetDoughsAsync();
+        var doughs = await this.pizzasService.GetPizzaDoughsAsync();
         var pizzaCreateViewModel = new PizzaCreateViewModel
         {
             DoughsList = doughs.Select(dough => new SelectListItem(dough.Name, dough.Id.ToString())).ToList()
@@ -90,10 +103,19 @@ public class PizzasController : Controller
     // POST: PizzasController/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Create([Bind("Name,Price,DoughId,Vegetarian")] PizzaCreateViewModel pizzaCreateViewModel)
     {
         if (!this.ModelState.IsValid)
-            return this.View(pizzaCreateViewModel);
+        {
+            var doughs = await this.pizzasService.GetPizzaDoughsAsync();
+            var model = new PizzaCreateViewModel
+            {
+                DoughsList = doughs.Select(dough => new SelectListItem(dough.Name, dough.Id.ToString())).ToList()
+            };
+            return this.View(model);
+        }
+            
         try
         {
             var newPizza = new CreatePizzaDTO
@@ -114,12 +136,13 @@ public class PizzasController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Edit(int id)
     {
         try
         {
             var pizza = await this.pizzasService.GetPizzaAsync(id);
-            var doughs = await this.doughService.GetDoughsAsync();
+            var doughs = await this.pizzasService.GetPizzaDoughsAsync();
 
             if (pizza is null)
             {
@@ -147,6 +170,7 @@ public class PizzasController : Controller
     // POST PizzasController/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Edit(int id, [Bind("Name,Price,DoughId,Vegetarian")] PizzaEditViewModel pizzaEditViewModel)
     {
         if (!this.ModelState.IsValid)
@@ -173,6 +197,7 @@ public class PizzasController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Delete(int id)
     {
         try
@@ -204,6 +229,7 @@ public class PizzasController : Controller
     // POST: Pizza/Delete/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteConfirmed(int id)
     {
         try
@@ -219,6 +245,7 @@ public class PizzasController : Controller
     }
 
     [HttpGet("Pizzas/{id}/Ingredients/Add")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AddIngredient(int id)
     {
         var pizza = await this.pizzasService.GetPizzaAsync(id);
@@ -232,6 +259,7 @@ public class PizzasController : Controller
     // POST: PizzasController/Edit/5
     [HttpPost("Pizzas/{id}/Ingredients/Add")]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> AddIngredient(int id, [Bind("Name,KCal,IsAllergen")] IngredientCreateViewModel ingredientCreateViewModel)
     {
         if (!this.ModelState.IsValid)
@@ -257,6 +285,7 @@ public class PizzasController : Controller
     }
 
     [HttpGet("Pizzas/{pizzaId}/Ingredients/{id}/Edit")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> EditIngredient(int pizzaId, int id)
     {
         var pizza = await this.pizzasService.GetPizzaAsync(pizzaId);
@@ -279,6 +308,7 @@ public class PizzasController : Controller
     // POST: PizzasController/Edit/5
     [HttpPost("Pizzas/{pizzaId}/Ingredients/{id}/Edit")]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> EditIngredient(int pizzaId, int id, [Bind("Id,Name,KCal,IsAllergen")] IngredientEditViewModel ingredientEditViewModel)
     {
         if (!this.ModelState.IsValid)
@@ -305,6 +335,7 @@ public class PizzasController : Controller
     }
 
     [HttpGet("Pizzas/{pizzaId}/Ingredients/{id}/Delete")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteIngredient(int pizzaId, int id)
     {
         var pizza = await this.pizzasService.GetPizzaAsync(pizzaId);
@@ -328,6 +359,7 @@ public class PizzasController : Controller
     // POST: DrinksController/Delete/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteIngredientConfirmed(int pizzaId, int id)
     {
         try

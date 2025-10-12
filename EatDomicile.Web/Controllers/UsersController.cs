@@ -1,8 +1,10 @@
-﻿using EatDomicile.Web.Services.Domains.Addresses.DTO;
-using EatDomicile.Web.Services.Domains.Users.DTO;
-using EatDomicile.Web.Services.Interfaces;
-using EatDomicile.Web.ViewModels.Users;
+﻿using EatDomicile.Web.Services.Abstractions.Application;
+using EatDomicile.Web.Services.Dtos.Application.Addresses;
+using EatDomicile.Web.Services.Dtos.Application.Users;
+using EatDomicile.Web.ViewsModels.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace EatDomicile.Web.Controllers;
 
@@ -17,21 +19,32 @@ public class UsersController : Controller
 
 
     // GET: UsersController
-    public async Task<IActionResult> Index()
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Index(int page = 1)
     {
-        var users = await this.usersService.GetUsersAsync();
-
-        return View(users.Select(static user => new UsersViewModel()
+        var response = await this.usersService.GetUsersAsync(page);
+        UserListViewModel model = new UserListViewModel()
         {
-            Id = user.Id,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            Phone = user.Phone,
-            Mail = user.Mail
-        }));
+            Items = response.Items.Select(user => new UsersViewModel()
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Phone = user.Phone,
+                Mail = user.Mail,
+                Role = user.Role
+            }).ToList(),
+            currentPage = response.currentPage,
+            maxPage = response.maxPage,
+            nextPage = response.nextPage,
+            previousPage = response.previousPage
+        };
+
+        return View(model);
     }
 
     // GET: UsersController/Details/5
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Details(int id)
     {
         try
@@ -50,6 +63,7 @@ public class UsersController : Controller
                 LastName = user.LastName,
                 Phone = user.Phone,
                 Mail = user.Mail,
+                Role = user.Role,
                 Address = new AddressDTO()
                 {
                     Id = user.Address.Id,
@@ -74,23 +88,32 @@ public class UsersController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public IActionResult Create()
     {
-        var userCreateViewModel = new UsersCreateViewModel();
+        List<SelectListItem> roles = new List<SelectListItem>();
+        roles.Add(new SelectListItem("Utilisateur", "User"));
+        roles.Add(new SelectListItem("Administrateur", "Admin"));
+
+        var userCreateViewModel = new UsersCreateViewModel()
+        {
+            Roles = roles
+        };
 
         return this.View(userCreateViewModel);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Create([Bind("FirstName,LastName,Mail,Phone,Street,City,State,Zip,Country")] UsersCreateViewModel userCreateViewModel)
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> Create([Bind("FirstName,LastName,Mail,Phone,Street,City,State,Zip,Country, Password, RoleId")] UsersCreateViewModel userCreateViewModel)
     {
         if (!this.ModelState.IsValid)
             return this.View(userCreateViewModel);
 
         try
         {
-            var newUser = new UserDTO
+            var newUser = new CreateUserDTO
             {
                 FirstName = userCreateViewModel.FirstName,
                 LastName = userCreateViewModel.LastName,
@@ -103,7 +126,9 @@ public class UsersController : Controller
                     State = userCreateViewModel.State,
                     Zip = userCreateViewModel.Zip,
                     Street = userCreateViewModel.Street
-                }
+                },
+                Password = userCreateViewModel.Password,
+                Role = userCreateViewModel.RoleId
             };
 
             await this.usersService.CreateUserAsync(newUser);
@@ -116,6 +141,7 @@ public class UsersController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Edit(int id)
     {
         try
@@ -126,6 +152,10 @@ public class UsersController : Controller
             {
                 return this.NotFound();
             }
+
+            List<SelectListItem> roles = new List<SelectListItem>();
+            roles.Add(new SelectListItem("Utilisateur", "User"));
+            roles.Add(new SelectListItem("Administrateur", "Admin"));
 
             var userEditViewModel = new UsersEditViewModel
             {
@@ -138,7 +168,9 @@ public class UsersController : Controller
                 City = user.Address.City,
                 State = user.Address.State,
                 Zip = user.Address.Zip,
-                Country = user.Address.Country
+                Country = user.Address.Country,
+                Roles = roles,
+                RoleId = user.Role
             };
 
             return this.View(userEditViewModel);
@@ -153,7 +185,8 @@ public class UsersController : Controller
     // POST: UsersController/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Edit(int id, [Bind("Id,FirstName,LastName,Mail,Phone,Street,City,State,Zip,Country")] UsersEditViewModel userEditViewModel)
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> Edit(int id, [Bind("Id,FirstName,LastName,Mail,Phone,Street,City,State,Zip,Country, RoleId")] UsersEditViewModel userEditViewModel)
     {
         if (!this.ModelState.IsValid)
             return this.View(userEditViewModel);
@@ -166,6 +199,7 @@ public class UsersController : Controller
                 LastName = userEditViewModel.LastName,
                 Phone = userEditViewModel.Phone,
                 Mail = userEditViewModel.Mail,
+                Role = userEditViewModel.RoleId,
                 Address = new AddressDTO()
                 {
                     City = userEditViewModel.City,
@@ -187,6 +221,7 @@ public class UsersController : Controller
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Delete(int id)
     {
         try
@@ -232,6 +267,7 @@ public class UsersController : Controller
     // POST: DrinksController/Delete/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteConfirmed(int id)
     {
         try

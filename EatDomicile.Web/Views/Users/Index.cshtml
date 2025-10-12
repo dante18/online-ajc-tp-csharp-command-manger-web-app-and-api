@@ -1,4 +1,5 @@
-﻿@model IEnumerable<EatDomicile.Web.ViewModels.Users.UsersViewModel>
+﻿@using EatDomicile.Web.ViewsModels.Users
+@model UserListViewModel
 
 @{
     ViewData["Title"] = "Utilisateurs";
@@ -32,16 +33,29 @@
                     <th class="text-center">Prénom</th>
                     <th class="text-center">Téléphone</th>
                     <th class="text-center">Email</th>
+                    <th class="text-center">Rôle</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var user in Model)
+                @foreach (var user in Model.Items)
                 {
                     <tr>
                         <td class="text-center">@user.LastName</td>
                         <td class="text-center">@user.FirstName</td>
                         <td class="text-center">@user.Phone</td>
                         <td class="text-center">@user.Mail</td>
+                        @if (user.Role == "User")
+                        {
+                            <td class="text-center">Utilisateur</td>
+                        }
+                        else if (user.Role == "Admin")
+                        {
+                            <td class="text-center">Administrateur</td>
+                        }
+                        else
+                        {
+                            <td class="text-center"></td>
+                        }
                         <td class="text-center">
                             <a asp-action="Details" asp-route-id="@user.Id" class="btn btn-info">Détail</a>
                             <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-warning">Modifier</a>
@@ -53,3 +67,47 @@
         </table>
     </div>
 </div>
+@if (Model.maxPage > 1)
+{
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                    @if (Model.currentPage == 1)
+                    {
+                        <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="@(Model.previousPage)">Précédent</a>
+                        </li>
+                    }
+                    @foreach (var i in Enumerable.Range(1, Model.maxPage))
+                    {
+                        if (i == Model.currentPage)
+                        {
+                            <li class="page-item active"><span class="page-link">@i</span></li>
+                        }
+                        else
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+                            </li>
+                        }
+                    }
+                    @if (Model.currentPage == Model.maxPage)
+                    {
+                        <li class="page-item disabled"><span class="page-link">Next</span></li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="@(Model.nextPage)">Next</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    </div>
+}

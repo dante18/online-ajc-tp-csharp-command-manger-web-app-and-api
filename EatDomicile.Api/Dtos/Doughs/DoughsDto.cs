@@ -1,4 +1,4 @@
-﻿namespace EatDomicile.Api.Dtos.Dough;
+﻿namespace EatDomicile.Api.Dtos.Doughs;
 
 public class DoughsDto
 {

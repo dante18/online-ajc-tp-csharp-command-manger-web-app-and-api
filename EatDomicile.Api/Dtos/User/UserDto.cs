@@ -15,4 +15,6 @@ public class UserDto
     public string Mail { get; set; }
 
     public AddressDto Address { get; set; }
+
+    public string Role { get; set; }
 }
